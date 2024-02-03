@@ -6,7 +6,7 @@ export default function page() {
   return (
     <div className={styles.page_wrapper}>
     <Navbar/>
-    <Form/>
+    <Form URL={process.env.login}/>
     
     </div>
   )

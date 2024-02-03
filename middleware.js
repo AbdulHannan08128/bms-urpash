@@ -21,7 +21,7 @@ export function middleware(request) {
 }
 
 
-  if (isLoggedIn == true) {
+  if (isLoggedIn == true) { 
     isLoggedIn=false;
     return NextResponse.next();
   }

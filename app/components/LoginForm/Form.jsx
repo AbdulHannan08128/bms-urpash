@@ -1,8 +1,9 @@
 'use client'
 import {useEffect, useState} from 'react'
 import styles from './Form.module.css'
-
-export default function Form() {
+import {post} from '../../../functions/axios.post'
+import {Redirect} from '../../../functions/Redirect'
+export default function Form(props) {
   const [id, setId] = useState();
   const [password, setPassword] = useState('');
 
@@ -17,10 +18,22 @@ export default function Form() {
      
       
     }
-   function submit(e){
+   async function submit(e){
     e.preventDefault();
     
-   
+   let data = {
+    id:id,
+    password:password
+   }
+
+   await post(props.URL,data,async ()=>{
+    alert('Submitted')
+    await Redirect('/admin')
+   },
+   (err)=>{
+    alert('Error')
+    console.log(err)
+   })
     
 
 
