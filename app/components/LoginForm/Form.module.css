@@ -1,0 +1,61 @@
+.form{
+    padding: 25px;
+    /* background: var(--third-color) */
+    background: #0505f800;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    border-radius: var(--br12);
+    box-shadow: 5px 10px 15px #4636a0;
+}
+.form h2{
+    font-size: 2rem;
+    font-family: 'comic sans ms';
+}
+.form input{
+    padding: 8px;
+    border-radius: var(--br12);
+    width: 300px;
+    border: none;
+    border: 3px solid #fff;
+    font-size: 1.3rem;
+}
+
+.form input:focus{
+   outline: none;
+   border: 3px solid var(--secondary-color);
+}
+
+.form button[type="submit"]{
+    padding: 4px;
+    border-radius: var(--br12);
+    width: 300px;
+    border: 3px solid #fff;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border: 3px solid var(--secondary-color);
+    cursor: pointer;
+}
+.form button[type="submit"]:hover{
+    background: var(--forth-color);
+}
+
+
+@media (max-width:500px){
+    .form{
+        max-width: 90vw;
+        scale: 0.9;
+    }
+    .form input{
+        
+        max-width: 80vw;
+        
+    }
+    .form button[type="submit"]{
+       
+        max-width: 80vw;
+       
+    }
+}
