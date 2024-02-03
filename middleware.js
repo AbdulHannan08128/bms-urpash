@@ -25,7 +25,7 @@ else if (path=='/admin') {
     
   } else {
     isLoggedIn = false;
-    console.log(cookie);
+    console.log(cookie); 
   }
 }
 
