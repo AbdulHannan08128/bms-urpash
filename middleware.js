@@ -19,6 +19,15 @@ export function middleware(request) {
     isLoggedIn = false;
   }
 }
+else if (path=='/admin') {
+  if (cookie.value == process.env.key) {
+    isLoggedIn = true;
+    
+  } else {
+    isLoggedIn = false;
+    console.log(cookie);
+  }
+}
 
 
   if (isLoggedIn == true) { 
@@ -32,6 +41,6 @@ export function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/api"]
+  matcher: ["/api", "/admin"]
 
 };

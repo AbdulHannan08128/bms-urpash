@@ -26,12 +26,18 @@ export default function Form(props) {
     password:password
    }
 
-   await post(props.URL,data,async ()=>{
-    alert('Submitted')
-    await Redirect('/admin')
+   await post(props.URL,data,async (data)=>{
+    
+    if (data.data.redirect) {
+      await Redirect('/admin')
+    }
+    else{
+      alert('Invalid Credintials')
+    }
+    
    },
    (err)=>{
-    alert('Error')
+    alert('.......Error......')
     console.log(err)
    })
     
