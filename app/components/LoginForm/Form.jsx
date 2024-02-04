@@ -2,7 +2,7 @@
 import {useEffect, useState} from 'react'
 import styles from './Form.module.css'
 import {post} from '../../../functions/axios.post'
-import {Redirect} from './Redirect'
+import { useRouter } from 'next/navigation'
 import Error from '../Error/Error';
 import Link from 'next/link'
 export default function Form(props) {
@@ -10,6 +10,7 @@ export default function Form(props) {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState();
   const [Submit, setSubmit] = useState(false);
+  const router = useRouter();
     function idC(e) {
       let Id = e.target.value;
       setId(Id);
@@ -33,7 +34,7 @@ export default function Form(props) {
    await post(props.URL,data,async (data)=>{
     
     if (data.data.redirect) {
-       Redirect('/admin')
+       router.push('/admin')
        
       setSubmit(false);
     }

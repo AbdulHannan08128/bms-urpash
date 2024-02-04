@@ -2,8 +2,8 @@
  
 import { redirect } from 'next/navigation'
  
-export async function Redirect(url) {
+export async function Redirect() {
     console.log('Redirecting Started');
-   redirect(url);
+   redirect('/admin');
   
 }
