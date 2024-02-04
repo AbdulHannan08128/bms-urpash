@@ -20,6 +20,7 @@ export function middleware(request) {
   }
 }
 else if (path=='/admin') {
+  if (cookie) {
   if (cookie.value == process.env.key) {
     isLoggedIn = true;
     
@@ -27,12 +28,37 @@ else if (path=='/admin') {
     isLoggedIn = false;
     console.log(cookie); 
   }
+    
 }
-
+else{
+  isLoggedIn=false;
+}
+}
+else if (path=='/') {
+  if (cookie) {
+  if (cookie.value == process.env.key) {
+    isLoggedIn = 'LoggedIn';
+    
+  } else {
+    isLoggedIn = 'LogIn';
+    console.log(cookie); 
+  }
+}
+else{
+  isLoggedIn='LogIn';
+}
+}
 
   if (isLoggedIn == true) { 
     isLoggedIn=false;
     return NextResponse.next();
+  }
+  else if(isLoggedIn=='LoggedIn'){
+    isLoggedIn = false;
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
+  else if(isLoggedIn=='LogIn'){
+    isLoggedIn = false;
   }
   else {
     
@@ -41,6 +67,6 @@ else if (path=='/admin') {
 }
 
 export const config = {
-  matcher: ["/api", "/admin"]
+  matcher: [ "/","/api", "/admin"]
 
 };

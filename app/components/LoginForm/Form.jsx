@@ -2,7 +2,7 @@
 import {useEffect, useState} from 'react'
 import styles from './Form.module.css'
 import {post} from '../../../functions/axios.post'
-import {Redirect} from '../../../functions/Redirect'
+import {Redirect} from './Redirect'
 import Error from '../Error/Error';
 import Link from 'next/link'
 export default function Form(props) {
@@ -23,7 +23,7 @@ export default function Form(props) {
     }
    async function submit(e){
     e.preventDefault();
-    setSubmit(true)
+    setSubmit(true);
     
    let data = {
     id:id,
@@ -33,7 +33,8 @@ export default function Form(props) {
    await post(props.URL,data,async (data)=>{
     
     if (data.data.redirect) {
-      await Redirect('/admin');
+       Redirect('/admin')
+       
       setSubmit(false);
     }
     else{

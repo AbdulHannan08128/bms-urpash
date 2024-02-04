@@ -1,9 +1,6 @@
-'use server'
- 
-import { redirect } from 'next/navigation'
- 
-export async function Redirect(url) {
-    console.log('Redirecting Started');
-   redirect(url);
-  
+
+import {redirect} from 'next/navigation'
+export default async function Redirect(url){
+    console.log('redirected'); 
+     redirect(url)
 }
