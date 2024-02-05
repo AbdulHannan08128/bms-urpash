@@ -1,10 +1,10 @@
 'use client'
-import styled from '@emotion/styled';
+
 import './Sidenav.css'
 
 import Link from 'next/link' 
-import { document } from 'postcss';
-export default function Sidenav(props) {
+
+export default function Sidenav() {
   
 
   function toggle(){
