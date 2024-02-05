@@ -1,0 +1,217 @@
+.sidenav{
+    width: 305px;
+    height: 100vh;
+    background: var(--sidenav-color);
+    box-shadow: 4px 6px 5px var(--secondary-color);
+  border: 1px solid black;
+   
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: baseline;
+  justify-content: baseline;
+  position: fixed;
+  overflow: scroll;
+  z-index: 10;
+  backdrop-filter: blur(100px);
+
+}
+::-webkit-scrollbar{
+    display: none;
+}
+.sidenav ul{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    
+}
+.sidenav ul li{
+    border-bottom: 2px solid var(--third-color);
+    width: 300px;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ddff00;
+    height: 40px;
+    overflow: hidden;
+    cursor: pointer;
+}
+.sidenav ul li a{
+   color: #fff;
+}
+
+.profile{
+  width: 280px;
+  height: 100px;
+  border-radius: 100px;
+  background-color: var(--third-color);
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  margin-top: 10px;
+  position: relative;
+}
+.sidenav .profile .img{
+   width: 100px;
+   height: 100px;
+   border-radius: 50%;
+   /* background: url(/user-icon.png) no-repeat center center/cover; */
+   background: url(/user_img.jpg) no-repeat center center/cover;
+   background-color: #ddff00;
+   display: block;
+   border: 5px solid aqua;
+}
+.sidenav .profile .info{
+    display: grid;
+    grid-template-rows: 1fr;
+}
+
+.sidenav .profile .info .name{
+    font-size: 1.7rem;
+    text-shadow: 2px 3px 2px #fff;
+    
+    font-weight: bold;
+    color: aqua;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+   
+
+    
+}
+.sidenav .profile .info .role{
+    position: absolute;
+    bottom: 0%;
+    right: 20%;
+    font-size: 0.6rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #000;
+    padding: 3px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.online{
+    width: 10px;
+    height: 10px;
+    background-color: green;
+    border-radius: 50%;
+    margin: 4px;
+    animation: blink 1s linear infinite;
+}
+@keyframes blink {
+    0%{
+        opacity: 100%;
+    }
+    50%{
+        opacity: 0%;
+    }
+    100%{
+        opacity: 100%;
+    }
+}
+
+.dropdown{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+    
+    gap: 10px;
+    padding-top:20px ;
+    border-left: 3px solid white;
+    opacity: 0%;
+
+}
+.dropdown span{
+    border-bottom: 3px solid white;
+    width: 200px;
+    text-align: center;
+    color: #fff;
+
+}
+.sidenav ul li.drop150:hover{
+    height: 170px;
+}
+.sidenav ul li.drop150:hover>.dropdown{
+    opacity: 100%;
+}
+
+.sidenav ul li.drop150 a.drop::after{
+    content: ' +';
+}
+.sidenav ul li.drop150:hover>a.drop::after{
+    content: ' -';
+}
+
+.sidenav ul li.drop110:hover{
+    height: 130px;
+}
+.sidenav ul li.drop110:hover>.dropdown{
+    opacity: 100%;
+}
+
+.sidenav ul li.drop110 a.drop::after{
+    content: ' +';
+}
+.sidenav ul li.drop110:hover>a.drop::after{
+    content: ' -';
+}
+
+
+
+.so{
+    position: absolute;
+    top: 20px;
+    left: 290px;
+    background-color: yellow;
+    color: purple;
+    rotate: 90deg;
+    padding: 10px;
+    font-weight: bold;
+    border-radius: 10px;
+    display: none;
+
+   z-index: 30;
+}
+
+.so:hover{
+    opacity: 80%;
+    cursor: pointer;
+}
+
+@media (max-width:1250px){
+  .sidenav{
+    width: 0;
+  }
+
+  .so{
+    display: block;
+    left: auto;
+    right: 0;
+    position: fixed;
+    z-index: 15;
+    border: 2px solid blue;
+}
+  }
+
+
+  .icon{
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    position: relative;
+    bottom: 0px;
+    margin: 10px 5px;
+    border-bottom: none;
+    color: var(--fifth-color);
+  }
+
+  .icon svg{
+    border-bottom: none !important;
+  }
+
+  .dropdown span.icon{
+    border-bottom: none;
+    color: var(--fifth-color);
+  }

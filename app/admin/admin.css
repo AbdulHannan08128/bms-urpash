@@ -1,0 +1,26 @@
+main{
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    overflow-x: hidden !important;
+  }
+  
+  .content{
+      overflow: hidden !important;
+      
+      
+  }
+  
+  @media (max-width:1250px){
+    main{
+      display: grid;
+      grid-template-columns: 0fr 4fr;
+      
+    }
+    .open{
+      width: 305px !important;
+      margin: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 10 !important;
+    }
+  }

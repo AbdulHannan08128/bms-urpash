@@ -1,17 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 :root {
   --primary-color: #11235A;
   --secondary-color:#596FB7;
   --third-color:#C6CF9B;
   --forth-color:#F6ECA9;
-  --background:#DCE5FD;
+  --fifth-color:#c9f40ce1;
+  --background:#dce5fd74;
   --br12:12px;
   --b10:10px;
+  --sidenav-color:#2f00ffc9;
+}
+a{
+  text-decoration: none;
+  color: black;
 }
 
 *{
   margin: 0;
   padding: 0;
   transition: 0.3s;
+  font-family: sans-serif;
 }
 
 body,html{
