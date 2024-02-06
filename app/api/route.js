@@ -1,5 +1,7 @@
 import {NextResponse} from 'next/server';
 import { setCookie } from '@/functions/setCookie';
+import connectDB from '@/utils/db';
+connectDB();
 
 export async function GET(){
     
@@ -17,7 +19,4 @@ export async function POST(req){
         console.log('Invalid User');
         return NextResponse.json({success:'working'});
     }
-
-  
-
 }
