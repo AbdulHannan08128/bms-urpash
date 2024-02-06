@@ -1,10 +1,10 @@
 import React from 'react'
-
+import Title from './title/Title'
 export default function page() {
   return (
   <>
-     
-     <h1 className=' w-auto h-20 block m-2 p-2 bg-gradient-to-tr from-gray-600 to-gray-900 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 active:opacity-[0.85] hover:cursor-pointer' style={{borderRadius:'12px', display:'flex', alignItems:'center', paddingLeft:'20px', fontSize:'2.6rem', letterSpacing:'2px', fontWeight:'bold'}}>Dashboard</h1>
+     <Title title='Dashboard'/>
+    
   <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
  
   

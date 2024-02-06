@@ -20,11 +20,11 @@ export default function Sidenav() {
   <div className='so' onClick={toggle}>OPEN</div>
   <aside className="bg-white shadow-sm -translate-x-80 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100" id='sn'>
   <div className="relative">
-    <a className="py-6 px-8 text-center" href="#/">
+    <Link className="py-6 px-8 text-center" href="/admin">
       <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">
         Teacher Admin Panel
       </h6>
-    </a>
+    </Link>
     <button
       className="align-middle select-none font-sans font-medium text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none w-8 max-w-[32px] h-8 max-h-[32px] rounded-lg text-xs text-white hover:bg-white/10 active:bg-white/30 absolute right-0 top-0 grid rounded-br-none rounded-tl-none xl:hidden"
       type="button"
@@ -52,7 +52,7 @@ export default function Sidenav() {
   <div className="m-4">
     <ul className="mb-4 flex flex-col gap-1">
       <li>
-        <a className="active" href="#/dashboard/home" aria-current="page">
+        <Link className="active" href="/" aria-current="page">
           <button
             className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg bg-gradient-to-tr from-gray-900 to-gray-800 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 active:opacity-[0.85] w-full flex items-center gap-4 px-4 capitalize"
             type="button"
@@ -73,10 +73,10 @@ export default function Sidenav() {
               dashboard
             </p>
           </button>
-        </a>
+        </Link>
       </li>
       <li>
-        <a className="" href="#/dashboard/profile">
+        <Link className="" href="/admin/profile">
           <button
             className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
             type="button"
@@ -100,10 +100,10 @@ export default function Sidenav() {
               profile
             </p>
           </button>
-        </a>
+        </Link>
       </li>
       <li>
-        <a className="" href="#/dashboard/tables">
+        <Link className="" href="/admin/checklist">
           <button
             className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
             type="button"
@@ -127,10 +127,10 @@ export default function Sidenav() {
               checklist
             </p>
           </button>
-        </a>
+        </Link>
       </li>
       <li>
-        <a className="" href="#/dashboard/notifications">
+        <Link className="" href="/admin/exams">
           <button
             className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
             type="button"
@@ -154,17 +154,19 @@ export default function Sidenav() {
               exams
             </p>
           </button>
-        </a>
+        </Link>
       </li>
     </ul>
     <ul className="mb-4 flex flex-col gap-1">
       <li className="mx-3.5 mt-4 mb-2">
-        <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-black uppercase opacity-75">
+        <Link href='/admin/accounts'>
+      <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-black uppercase opacity-75">
           accounts
         </p>
+        </Link>
       </li>
       <li>
-        <a className="" href="#/auth/sign-in">
+        <Link className="" href="/admin/accounts/teachers">
           <button
             className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
             type="button"
@@ -188,10 +190,10 @@ export default function Sidenav() {
               teachers
             </p>
           </button>
-        </a>
+        </Link>
       </li>
       <li>
-        <a className="" href="#/auth/sign-up">
+        <Link className="" href="/admin/accounts/students">
           <button
             className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
             type="button"
@@ -210,7 +212,7 @@ export default function Sidenav() {
               students
             </p>
           </button>
-        </a>
+        </Link>
       </li>
     </ul>
   </div>

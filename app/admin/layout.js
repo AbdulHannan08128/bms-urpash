@@ -6,17 +6,23 @@ export const dynamic = "force-dynamic";
 
 export default function AdminLayout({ children }) {
     return  (
+      <>
+      
     <main>
+     
       <header>
       <Sidenav/>
       </header>
 
        <div className='content'>
+        
        <div style={{ overflowY:"scroll"}}>
       {children}
+      
       </div>
       </div>
       
     </main>
+    </>
     )
   }
