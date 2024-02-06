@@ -1,8 +1,9 @@
 import {NextResponse} from 'next/server';
 import { setCookie } from '@/functions/setCookie';
 import connectDB from '@/utils/db';
+import {addStudents} from '../../dbfunctions/addStudent'
 connectDB();
-
+// addStudents([data]);
 export async function GET(){
     
     return NextResponse.json({success:'working'});

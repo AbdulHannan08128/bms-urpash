@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { post } from '@/functions/axios.post'; 
 import * as XLSX from 'xlsx'
-export default function Home() {
+export default function Home(props) {
   const [jsonData, setJsonData] = useState(null);
 
   const onDrop = async (acceptedFiles) => {
@@ -28,7 +28,7 @@ export default function Home() {
     e.preventDefault();
     let data = jsonData;
     console.log(jsonData);
-    post('http://localhost:3000/api/addStudents', jsonData, ()=>{
+    post(props.BULK_URL, jsonData, ()=>{
       alert('Saved');
     },
     (err)=>{
@@ -56,12 +56,14 @@ export default function Home() {
           <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">{JSON.stringify(jsonData, null, 2)}</pre>
         </div>
       )} */}
-       <button
-      type="submit"
-      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={submit}
-    >
-      Upload
-    </button>
+      {jsonData!=null?
+            <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-10 pl-10 pr-10" onClick={submit}
+          >
+            Upload
+          </button>:''}
+     
     </div>
   );
 }
