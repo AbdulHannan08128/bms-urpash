@@ -1,7 +1,12 @@
 'use client'
 import React, { useState } from 'react';
 export const dynamic = "force-dynamic";
-
+export const dynamicParams = true;
+export const revalidate = 10;
+export const fetchCache = "auto";
+export const runtime = "nodejs";
+export const preferredRegion = "auto";
+export const maxDuration = 5;
 function CustomSelect({ options, onSelect }) {
     const [selectedOption, setSelectedOption] = useState('');
    
