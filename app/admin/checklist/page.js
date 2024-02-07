@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Checklist from './checklist'
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-export const revalidate = 10;
+
 export const fetchCache = "auto";
 export const runtime = "nodejs";
 export const preferredRegion = "auto";
