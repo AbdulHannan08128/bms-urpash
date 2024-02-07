@@ -19,7 +19,7 @@ export default function Checklist(props) {
     async function getData(grade) {
         get(`${props.URL}?grade=${grade}`, (response) => {
             setData(response.data);
-            alert('Success');
+            // alert('Success');
             console.log(response.data);
             console.log(data);
         }, () => {
@@ -37,15 +37,15 @@ export default function Checklist(props) {
 
     return (
         <>
-            <div className='w-auto h-auto p-20 flex align-middle justify-center flex-col gap-0'>
+            <div className='w-auto h-auto p-0 mt-6 flex align-middle justify-center flex-col gap-0'>
                 <Select Function={setGrade} />
 
                 <div className="overflow-scroll rounded-lg border border-gray-200 shadow-md m-5">
                     <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
-                                    Name-Aadhar
+                                <th scope="col" className="px-6 py-4 font-medium text-gray-900 pl-5">
+                                    Name
                                 </th>
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
                                     Roll
@@ -65,7 +65,7 @@ export default function Checklist(props) {
                                     <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                                         <div className="relative h-10 w-10">
                                             {/* Render the image here */}
-                                         {item.photo&&    <img
+                                         {item.photo?   <img
                             src={`data:image/png;base64,${Uint8Array.from(
                               item.photo.data
                             ).reduce(
@@ -78,7 +78,7 @@ export default function Checklist(props) {
                             className={styles.binimage}
                           />
                                          
-                                        }
+                                       :<span className='block w-10 h-10 bg-slate-400 rounded-full'></span> }
                                             {/* Use the appropriate status indicator here */}
                                           
                                         </div>
