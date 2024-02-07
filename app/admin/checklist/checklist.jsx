@@ -3,6 +3,12 @@ import React, { useEffect, useState } from 'react';
 import Select from './Select';
 import { get } from '../../../functions/axios.get';
 export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+export const revalidate = 10;
+export const fetchCache = "auto";
+export const runtime = "nodejs";
+export const preferredRegion = "auto";
+export const maxDuration = 5;
 
 export default function Checklist(props) {
     const [grade, setGrade] = useState(false);
