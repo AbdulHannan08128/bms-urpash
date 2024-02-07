@@ -9,8 +9,10 @@ export const fetchCache = "auto";
 export const runtime = "nodejs";
 export const preferredRegion = "auto";
 export const maxDuration = 5;
+import {useRouter} from 'next/navigation'
 
 export default function Checklist(props) {
+  const router = useRouter();
     const [grade, setGrade] = useState(false);
     const [data, setData] = useState([]);
 
@@ -25,8 +27,10 @@ export default function Checklist(props) {
     useEffect(() => {
         if (grade) {
             getData(grade);
+            router.refresh();
         }
     }, [grade]);
+   
 
     return (
         <>
