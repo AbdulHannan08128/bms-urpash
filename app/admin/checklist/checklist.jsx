@@ -37,6 +37,7 @@ export default function Checklist(props) {
 
     return (
         <>
+       
             <div className='w-auto h-auto p-0 mt-6 flex align-middle justify-center flex-col gap-0'>
                 <Select Function={setGrade} />
 
@@ -60,7 +61,7 @@ export default function Checklist(props) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 border-t border-gray-100">
-                            {data.map((item, index) => (
+                            {data?data.map((item, index) => (
                                 <tr key={index} className="hover:bg-gray-50">
                                     <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                                         <div className="relative h-10 w-10">
@@ -96,7 +97,9 @@ export default function Checklist(props) {
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                            )): <div className="flex justify-center items-center ">
+                            <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-gray-900"></div>
+                          </div>}
                         </tbody>
                     </table>
                 </div>
