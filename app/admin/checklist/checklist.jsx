@@ -19,7 +19,9 @@ export default function Checklist(props) {
     async function getData(grade) {
         get(`${props.URL}?grade=${grade}`, (response) => {
             setData(response.data);
-            alert('Success')
+            alert('Success');
+            console.log(response.data);
+            console.log(data);
         }, () => {
             // alert('An Error Occurred');
         });
