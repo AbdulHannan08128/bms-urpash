@@ -1,5 +1,7 @@
 import React from 'react'
 import Title from './title/Title'
+export const dynamic = "force-dynamic";
+
 export default function page() {
   return (
   <>

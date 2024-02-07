@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from './Select';
 import { get } from '../../../functions/axios.get';
+export const dynamic = "force-dynamic";
 
 export default function Checklist(props) {
     const [grade, setGrade] = useState(false);

@@ -1,8 +1,10 @@
 'use client'
 import React, { useState } from 'react';
+export const dynamic = "force-dynamic";
 
 function CustomSelect({ options, onSelect }) {
     const [selectedOption, setSelectedOption] = useState('');
+   
 
     const handleSelectChange = (e) => {
         const value = e.target.value;
