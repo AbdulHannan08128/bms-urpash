@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { post } from '@/functions/axios.post'; 
+import Alert from './Alert'
 import * as XLSX from 'xlsx'
 export default function Home(props) {
+  const [success, setSuccess]= useState(false);
   const [jsonData, setJsonData] = useState(null);
 
   const onDrop = async (acceptedFiles) => {
@@ -29,7 +31,7 @@ export default function Home(props) {
     let data = jsonData;
     console.log(jsonData);
     post(props.BULK_URL, jsonData, ()=>{
-      alert('Saved');
+      setSuccess(true);
     },
     (err)=>{
       alert('Error')
@@ -38,6 +40,7 @@ export default function Home(props) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
+    <>
     <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-4">Upload Excel File</h1>
       <div
@@ -64,7 +67,41 @@ export default function Home(props) {
             Upload
           </button>:''}
      
+
+
+
+
+
+
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{success&&<Alert Function={setSuccess}/>}
+
+    </>
   );
 }
 

@@ -11,6 +11,10 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  admission:{
+    type:String,
+    required:false
+  },
   grade: {
     type: String,
     required: false,
