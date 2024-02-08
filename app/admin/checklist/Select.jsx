@@ -18,7 +18,7 @@ function CustomSelect({ options, onSelect }) {
     };
 
     return (
-        <div className="relative inline-block w-64">
+        <div className="relative inline-block w-64 PHIDE">
             <select
                 value={selectedOption}
                 onChange={handleSelectChange}
@@ -50,6 +50,7 @@ function CustomSelect({ options, onSelect }) {
 
 function MyComponent(props) {
     const options = [
+        { label: 'All Classes', value: 'all' },
         { label: 'Ist', value: 'Ist' },
         { label: '2nd', value: '2nd' },
         { label: '3rd', value: '3rd' },

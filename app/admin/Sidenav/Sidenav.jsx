@@ -17,8 +17,8 @@ export default function Sidenav() {
   return (
   <>
   
-  <div className='so' onClick={toggle}>OPEN</div>
-  <aside className="bg-white shadow-sm -translate-x-80 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100" id='sn' onClick={toggle}>
+  <div className='so PHIDE' onClick={toggle} >OPEN</div>
+  <aside className="bg-white shadow-sm -translate-x-80 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100 PHIDE" id='sn' onClick={toggle}>
   <div className="relative">
     <Link className="py-6 px-8 text-center" href="/admin">
       <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">

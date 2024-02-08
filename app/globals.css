@@ -37,3 +37,10 @@ body,html{
   padding: 10px;
  
 }
+
+
+@media print{
+  .PHIDE{
+      display: none !important;
+  }
+}

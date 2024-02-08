@@ -31,7 +31,7 @@ export default function page() {
         {/* Student Card */}
         <div className="flex-1">
           <div className="block bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
-            <Link href='/checklist/print' className='block p-6'>
+            <Link href='/admin/checklist/print' className='block p-6'>
               
                 <div className="uppercase text-sm text-indigo-500 font-semibold">/Print</div>
                 <p className='text-lg font-medium mt-2 hover:underline'>Print Checklist</p>

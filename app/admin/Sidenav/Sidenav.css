@@ -215,3 +215,11 @@
     border-bottom: none;
     color: var(--fifth-color);
   }
+
+
+
+@media print{
+    .PHIDE{
+        display: none !important;
+    }
+}

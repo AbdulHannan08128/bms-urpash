@@ -30,9 +30,26 @@ export default function Checklist(props) {
             setLoading(false);
         });
     }
-
+    async function getAllData() {
+        setLoading(true)
+        get(`${props.URL}`, (response) => {
+            setData(response.data);
+            // alert('Success');
+            console.log(response.data);
+            console.log(data);
+            setLoading(false);
+        }, () => {
+            // alert('An Error Occurred');
+            setLoading(false);
+        });
+    }
+    
     useEffect(() => {
-        if (grade) {
+        if (grade=='all') {
+            getAllData();
+            router.refresh();
+        }
+        else if(grade) {
             getData(grade);
             router.refresh();
         }
@@ -60,11 +77,14 @@ export default function Checklist(props) {
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
                                     Phone
                                 </th>
+                                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                                    Class
+                                </th>
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900" />
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 border-t border-gray-100">
-                            {data.map((item, index) => (
+                            {data?data.map((item, index) => (
                                 <tr key={index} className="hover:bg-gray-50">
                                     <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                                         <div className="relative h-10 w-10">
@@ -94,16 +114,17 @@ export default function Checklist(props) {
                                     <td className="px-6 py-4">{item.roll}</td>
                                     <td className="px-6 py-4">{item.parentage}</td>
                                     <td className="px-6 py-4">{item.phone}</td>
+                                    <td className="px-6 py-4">{item.grade}</td>
                                     <td className="px-6 py-4">
                                         <div className="flex justify-end gap-4">
                                             {/* Add your delete and edit buttons here */}
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                            )):''}
                         </tbody>
                     </table>
-                    {loading? <div className="flex justify-center items-center ">
+                    {loading? <div className="flex justify-center items-center w-screen h-screen absolute top-0 left-0 backdrop-blur">
                             <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-gray-900 m-2"></div>
                           </div>:''}
                 </div>
