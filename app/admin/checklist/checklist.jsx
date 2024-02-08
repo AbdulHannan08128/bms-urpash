@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from './Select';
 import { get } from '../../../functions/axios.get';
+import Link from 'next/link'
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
@@ -80,6 +81,15 @@ export default function Checklist(props) {
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
                                     Class
                                 </th>
+                                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                                    Adm No.
+                                </th>
+                                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                                    Aadhar
+                                </th>
+                                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                                    DOB
+                                </th>
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900" />
                             </tr>
                         </thead>
@@ -115,9 +125,17 @@ export default function Checklist(props) {
                                     <td className="px-6 py-4">{item.parentage}</td>
                                     <td className="px-6 py-4">{item.phone}</td>
                                     <td className="px-6 py-4">{item.grade}</td>
+                                    <td className="px-6 py-4">{item.admission}</td>
+                                    <td className="px-6 py-4">{item.aadhar}</td>
+                                    <td className="px-6 py-4">{item.dob}</td>
+                                    
                                     <td className="px-6 py-4">
                                         <div className="flex justify-end gap-4">
-                                            {/* Add your delete and edit buttons here */}
+                                       <Link href={'/admin/checklist/edit/'+item.admission}>
+                                       <button className="print-button md:inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded PHIDE">
+                                      EDIT
+                                   </button>
+                                       </Link>
                                         </div>
                                     </td>
                                 </tr>

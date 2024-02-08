@@ -18,8 +18,8 @@ export default function Sidenav() {
   <>
   
   <div className='so PHIDE' onClick={toggle} >OPEN</div>
-  <aside className="bg-white shadow-sm -translate-x-80 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100 PHIDE" id='sn' onClick={toggle}>
-  <div className="relative">
+  <aside className="bg-white shadow-sm -translate-x-80 fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100 PHIDE" id='sn' onClick={toggle} style={{overflowY:"scroll"}}>
+  <div className="relative overflow-scroll" style={{overflowY:"scroll"}}>
     <Link className="py-6 px-8 text-center" href="/admin">
       <h6 className="block antialiased tracking-normal font-sans text-base font-semibold leading-relaxed text-blue-gray-900">
         Teacher Admin Panel
@@ -49,7 +49,7 @@ export default function Sidenav() {
       </span>
     </button>
   </div>
-  <div className="m-4">
+  <div className="m-4" style={{overflowY:"scroll", paddingBottom:'20px'}}>
     <ul className="mb-4 flex flex-col gap-1">
       <li>
         <Link className="active" href="/" aria-current="page">
@@ -102,33 +102,7 @@ export default function Sidenav() {
           </button>
         </Link>
       </li>
-      <li>
-        <Link className="" href="/admin/checklist">
-          <button
-            className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
-            type="button"
-            fdprocessedid="hovjah"
-            style={{ position: "relative", overflow: "hidden" }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-              className="w-5 h-5 text-inherit"
-            >
-              <path
-                fillRule="evenodd"
-                d="M1.5 5.625c0-1.036.84-1.875 1.875-1.875h17.25c1.035 0 1.875.84 1.875 1.875v12.75c0 1.035-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 18.375V5.625zM21 9.375A.375.375 0 0020.625 9h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm0 3.75a.375.375 0 00-.375-.375h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zm0 3.75a.375.375 0 00-.375-.375h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5a.375.375 0 00.375-.375v-1.5zM10.875 18.75a.375.375 0 00.375-.375v-1.5a.375.375 0 00-.375-.375h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375h7.5zM3.375 15h7.5a.375.375 0 00.375-.375v-1.5a.375.375 0 00-.375-.375h-7.5a.375.375 0 00-.375.375v1.5c0 .207.168.375.375.375zm0-3.75h7.5a.375.375 0 00.375-.375v-1.5A.375.375 0 0010.875 9h-7.5A.375.375 0 003 9.375v1.5c0 .207.168.375.375.375z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
-              checklist
-            </p>
-          </button>
-        </Link>
-      </li>
+      
       <li>
         <Link className="" href="/admin/exams">
           <button
@@ -152,6 +126,67 @@ export default function Sidenav() {
             </svg>
             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
               exams
+            </p>
+          </button>
+        </Link>
+      </li>
+    </ul>
+    <ul className="mb-4 flex flex-col gap-1">
+      <li className="mx-3.5 mt-4 mb-2">
+        <Link href='/admin/checklist'>
+      <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-black uppercase opacity-75">
+          checklist
+        </p>
+        </Link>
+      </li>
+      <li>
+        <Link className="" href="/admin/checklist/add">
+          <button
+            className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
+            type="button"
+            fdprocessedid="3mrx69"
+          >
+              <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-6 w-6"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 2a1 1 0 00-1 1v6H3a1 1 0 100 2h6v6a1 1 0 102 0v-6h6a1 1 0 100-2h-6V3a1 1 0 00-1-1z"
+        clipRule="evenodd"
+      />
+    </svg>
+            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+              add
+            </p>
+          </button>
+        </Link>
+      </li>
+      <li>
+        <Link className="" href="/admin/checklist/print">
+          <button
+            className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
+            type="button"
+            fdprocessedid="ie9hpg"
+          >
+            <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 6h16M4 10h16M4 14h16M4 18h16M8 6V2h8V6M12 22V18"
+      />
+    </svg>
+            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+              print
             </p>
           </button>
         </Link>
