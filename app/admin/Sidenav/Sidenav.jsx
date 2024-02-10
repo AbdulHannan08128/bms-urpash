@@ -7,7 +7,7 @@ import Link from 'next/link'
 export default function Sidenav() {
   
 
-  function toggle(){
+ function toggle(){
      document.querySelector('#sn').classList.toggle('-translate-x-80');
      document.querySelector('#sn').classList.toggle('open');
      

@@ -1,28 +1,88 @@
 'use client'
-import React, { useState } from 'react';
-
-const UserForm = (props) => {
+import React, { useEffect, useState } from 'react';
+import { get } from '../../../../../functions/axios.get';
+import {post} from '../../../../../functions/axios.post'
+const MyForm = (props) => {
+  const [data, setData] = useState({});
   const [formData, setFormData] = useState({
-    name: '',
     roll: '',
-    admission: props.admission,
+    admission: '',
+    aadhar: '',
+    name: '',
+    father: '',
+    mother: '',
+    category: '',
     grade: '',
     dob: '',
-    parentage: '',
     phone: '',
     email: '',
+    address: '',
+    account: '',
     photo: null,
-    aadhar: ''
+    selectOption: ''
   });
 
+  const [photo,setPhoto] = useState(null);
+  const [change,setChange] = useState(false);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+         await get(`${props.URL}?admission=${props.admission}`,(response)=>{
+        const fetchedData = response.data[0];
+        if (fetchedData) {
+          setData(fetchedData);
+        } else {
+          alert('ERROR: No data received');
+        }
+      });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        alert('ERROR: Failed to fetch data');
+      }
+    };
+  
+    fetchData();
+  }, [props.URL, props.admission]);
+  
+  // Update formData when data changes
+  useEffect(() => {
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      roll: data.roll,
+      name:data.name,
+      dob:data.dob,
+      admission:data.admission,
+      aadhar:data.aadhar,
+      father:data.father||data.parentage,
+      mother:data.mother,
+      grade:data.grade,
+      phone:data.phone,
+      email:data.email,
+      address:data.address,
+      account:data.account,
+      photo:data.photo||null,
+      selectOption:data.category
+    }));
+  }, [data]);
+  
+  // Log the updated state
+  useEffect(() => {
+    console.log('Updated data:', data);
+  }, [data]);
+  
+
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'photo') {
+    
+    if (e.target.name === 'photo') {
+      setChange(true)
       setFormData({
         ...formData,
-        [name]: files[0]
+        photo: URL.createObjectURL(e.target.files[0])
       });
+      setPhoto(e.target.files[0]);
     } else {
+      const { name, value } = e.target;
       setFormData({
         ...formData,
         [name]: value
@@ -30,184 +90,295 @@ const UserForm = (props) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    try {
+      const formDATA = new FormData();
+      // Append form data
+      formDATA.append('roll', formData.roll);
+      formDATA.append('admission', formData.admission);
+      formDATA.append('aadhar', formData.aadhar);
+      formDATA.append('name', formData.name);
+      formDATA.append('father', formData.father);
+      formDATA.append('mother', formData.mother);
+      formDATA.append('category', formData.selectOption);
+      formDATA.append('grade', formData.grade);
+      formDATA.append('dob', formData.dob);
+      formDATA.append('phone', formData.phone);
+      formDATA.append('email', formData.email);
+      formDATA.append('address', formData.address);
+      formDATA.append('account', formData.account);
+      formDATA.append('photo', photo); // Append the file object
+  
+      // Send the form data using your post function
+      await post(props.POST_URL, formDATA, () => {
+        alert('Form Updated Successfully');
+      });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form');
+    }
   };
-
+  
   return (
-    <div className="max-w-md mx-auto mt-8">
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <div>
+      {/* Display selected photo */}
+      <label htmlFor='photo' className='cursor-pointer'>
+        {formData.photo ? (
+
+        change?(<div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden mb-4 mt-10 flex justify-center align-middle">
+            <img className="w-96 h-96" src={formData.photo} alt="Selected" />
+          </div>):  <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden mb-4 mt-10 flex justify-center align-middle"><img
+                            src={`data:image/png;base64,${Uint8Array.from(
+                              formData.photo.data
+                            ).reduce(
+                              (data, byte) => data + String.fromCharCode(byte),
+                              ""
+                            )}`}
+                            alt="Binary Image"
+                            
+                            className='w96 h96'
+                            
+                            
+                          />
+</div>
+          
+
+
+        ) : (
+          <div className="max-w-md mx-auto bg-slate-400 rounded-lg shadow-lg overflow-hidden mb-4 mt-10 w-full p-10">
+            <span className='text-lg font-bold'>SELECT PHOTO</span>
+          </div>
+        )}
+      </label>
+
+      {/* Form */}
+      <form className="max-w-md mx-auto bg-white p-10 mb-10" onSubmit={handleSubmit}>
+        {/* Roll */}
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-            Name
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="name"
-            type="text"
-            placeholder="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="roll">
+          <label className="block mb-1" htmlFor="roll">
             Roll
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="roll"
+            className="w-full border border-gray-300 rounded px-3 py-2"
             type="text"
-            placeholder="Roll"
+            id="roll"
             name="roll"
             value={formData.roll}
             onChange={handleChange}
           />
         </div>
+
+        {/* Admission */}
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="admission">
+          <label className="block mb-1" htmlFor="admission">
             Admission
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="admission"
+            className="w-full border border-gray-300 rounded px-3 py-2"
             type="text"
-            placeholder="Admission"
+            id="admission"
             name="admission"
             value={formData.admission}
             onChange={handleChange}
           />
         </div>
+
+        {/* Aadhar */}
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="grade">
-            Grade
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="grade"
-            type="text"
-            placeholder="Grade"
-            name="grade"
-            value={formData.grade}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="dob">
-            Date of Birth
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="dob"
-            type="text"
-            placeholder="Date of Birth"
-            name="dob"
-            value={formData.dob}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="parentage">
-            Parentage
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="parentage"
-            type="text"
-            placeholder="Parentage"
-            name="parentage"
-            value={formData.parentage}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phone">
-            Phone
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="phone"
-            type="text"
-            placeholder="Phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-            Email
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="email"
-            type="email"
-            placeholder="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="aadhar">
+          <label className="block mb-1" htmlFor="aadhar">
             Aadhar
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="aadhar"
+            className="w-full border border-gray-300 rounded px-3 py-2"
             type="text"
-            placeholder="Aadhar"
+            id="aadhar"
             name="aadhar"
             value={formData.aadhar}
             onChange={handleChange}
           />
         </div>
+
+        {/* Name */}
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="photo">
+          <label className="block mb-1" htmlFor="name">
+            Name
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Father */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="father">
+            Father
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="father"
+            name="father"
+            value={formData.father}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Mother */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="mother">
+            Mother
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="mother"
+            name="mother"
+            value={formData.mother}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Category */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="selectOption">
+            Select Category
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            id="selectOption"
+            name="selectOption"
+            value={formData.selectOption}
+            onChange={handleChange}
+          >
+            <option value="">Select</option>
+            <option value="OM" >OM</option>
+            <option value="RBA">RBA</option>
+            <option value="ST">ST</option>
+            <option value="SC">SC</option>
+            <option value="STGB">STGB</option>
+          </select>
+        </div>
+
+        {/* Grade */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="grade">
+            Grade
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="grade"
+            name="grade"
+            value={formData.grade}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* DOB */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="dob">
+            DOB
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="dob"
+            name="dob"
+            value={formData.dob}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Phone */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="phone">
+            Phone
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="phone"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Email */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="email">
+            Email
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Address */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="address">
+            Address
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="address"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Account */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="account">
+            Account
+          </label>
+          <input
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            type="text"
+            id="account"
+            name="account"
+            value={formData.account}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Photo */}
+        <div className="mb-4">
+          <label className="block mb-1" htmlFor="photo">
             Photo
           </label>
           <input
-            className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline "
-            style={{width:'0', height:'0', position:'relative', right:'100vw'}}
-            id="photo"
+            className="w-full border border-gray-300 rounded px-3 py-2"
             type="file"
-            accept="image/*"
+            id="photo"
             name="photo"
-            
+            accept="image/*"
             onChange={handleChange}
-            
           />
-          <label htmlFor='photo' className='cursor-pointer b'>
-          {formData.photo ? (
-            <div className="mt-2 flex justify-center items-center">
-              <img
-                src={URL.createObjectURL(formData.photo)}
-                alt="User"
-                className="w-16 h-16 rounded-full border-2 border-gray-500"
-              />
-            </div>
-          ):<div className="mt-2 flex justify-center items-center ">
-            <div className='w-32 h-32 bg-slate-400 rounded-full'>
- 
-            </div>
-          
-        </div>}
-        </label>
         </div>
-        <div className="flex items-center justify-between">
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="submit"
-          >
-            Submit
-          </button>
-        </div>
+
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">
+          Submit
+        </button>
       </form>
     </div>
   );
 };
 
-export default UserForm;
+export default MyForm;
+
+
 

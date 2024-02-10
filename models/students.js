@@ -3,10 +3,6 @@
 import mongoose from 'mongoose';
 
 const studentSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: false
-  },
   roll: {
     type: String,
     required: false
@@ -15,6 +11,28 @@ const studentSchema = new mongoose.Schema({
     type:String,
     required:false
   },
+  aadhar: {
+    type: String,
+    required: false
+  }, 
+  name: {
+    type: String,
+    required: false
+  },
+  father: {
+    type: String,
+    required: false
+  }, 
+  mother: {
+    type: String,
+    required: false
+  }, 
+  
+ category:{
+  type:String,
+  required:false
+ },
+ 
   grade: {
     type: String,
     required: false,
@@ -23,10 +41,7 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: false
   }, 
-  parentage: {
-    type: String,
-    required: false
-  }, 
+  
   phone: {
     type: String,
     required: false
@@ -39,10 +54,16 @@ const studentSchema = new mongoose.Schema({
     type: Buffer,
     required: false
   }, 
-  aadhar: {
-    type: String,
-    required: false
-  }, 
+  address:{
+    type:String,
+    required:false
+  },
+  account:{
+    type:String,
+    required:false
+  }
+  
+ 
   
 });
 

@@ -5,7 +5,7 @@ import { get } from '../../../functions/axios.get';
 import Link from 'next/link'
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
-
+import styles from './checklist.module.css'
 export const fetchCache = "auto";
 export const runtime = "nodejs";
 export const preferredRegion = "auto";
@@ -73,7 +73,10 @@ export default function Checklist(props) {
                                     Roll
                                 </th>
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
-                                    Parentage
+                                    Father
+                                </th>
+                                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                                    Mother
                                 </th>
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
                                     Phone
@@ -83,6 +86,9 @@ export default function Checklist(props) {
                                 </th>
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
                                     Adm No.
+                                </th>
+                                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                                    Acc No.
                                 </th>
                                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
                                     Aadhar
@@ -109,7 +115,9 @@ export default function Checklist(props) {
                             alt="Binary Image"
                             width={50}
                             height={50}
-                            className={styles.binimage}
+                            className={styles.img}
+                            
+                            
                           />
                                          
                                        :<span className='block w-10 h-10 bg-slate-400 rounded-full'></span> }
@@ -122,10 +130,12 @@ export default function Checklist(props) {
                                         </div>
                                     </th>
                                     <td className="px-6 py-4">{item.roll}</td>
-                                    <td className="px-6 py-4">{item.parentage}</td>
+                                    <td className="px-6 py-4">{item.father}</td>
+                                    <td className="px-6 py-4">{item.mother}</td>
                                     <td className="px-6 py-4">{item.phone}</td>
                                     <td className="px-6 py-4">{item.grade}</td>
                                     <td className="px-6 py-4">{item.admission}</td>
+                                    <td className="px-6 py-4">{item.account}</td>
                                     <td className="px-6 py-4">{item.aadhar}</td>
                                     <td className="px-6 py-4">{item.dob}</td>
                                     

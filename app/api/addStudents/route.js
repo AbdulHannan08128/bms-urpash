@@ -7,13 +7,20 @@ connectDB();
 // addStudents([data]);
 export async function GET(req){
     let grade = req.nextUrl.searchParams.get('grade');
+    let admission = req.nextUrl.searchParams.get('admission');
     let students
     if (grade) {
       students = await getStudents({grade:grade});
     }
-  else{
-     students = await getStudents({});
+
+  else if(admission) {
+    students = await getStudents({admission:admission});
   }
+  else{
+    students = await getStudents({});
+ }
+
+
   return NextResponse.json(students);
     
 
