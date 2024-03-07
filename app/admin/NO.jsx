@@ -4,9 +4,12 @@ import {get} from '../../functions/axios.get'
 export default function NO(props) {
     
     const [data, setData] = useState([]);
+    const [loading, setLoading] = useState('...')
+    
     useEffect(()=>{
         get(props.URL, (DATA)=>{
             setData(DATA.data);
+            setLoading(false);
            })
     }, []);
   return (
@@ -30,7 +33,7 @@ export default function NO(props) {
           Total Students
         </p>
         <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
-          {data.length}
+          {loading?<span style={{fontSize:'0.8rem'}}>LOADING...</span>:data.length}
         </h4>
       </div>
       <div className="border-t border-blue-gray-50 p-4">
