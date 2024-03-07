@@ -43,7 +43,7 @@ export default function page() {
       </div>
 
 
-<Checklist URL={process.env.BULK_URL}/>
+<Checklist URL={process.env.BULK_URL} deleteURL={process.env.deleteURL}/>
 
 
       

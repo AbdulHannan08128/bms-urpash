@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import Select from "./Select";
 import { get } from "../../../functions/axios.get";
+import { post } from "../../../functions/axios.post";
+
 import Link from "next/link";
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;
@@ -17,9 +19,12 @@ export default function Checklist(props) {
   const [grade, setGrade] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [Delete, setDelete] = useState(false);
+  const [Deleted, setDeleted] = useState(false);
+  const [deleteItem, setDeleteItem] = useState("Ayaan");
   async function getData(grade) {
     setLoading(true);
+  
     get(
       `${props.URL}?grade=${grade}`,
       (response) => {
@@ -51,6 +56,33 @@ export default function Checklist(props) {
         setLoading(false);
       }
     );
+  }
+  async function deleteConformation() {
+    if (Delete) {
+      setDelete(false);
+    } else {
+      setDelete(true);
+    }
+  }
+  async function DELETED() {
+    if (Deleted) {
+      setDeleted(false);
+    } else {
+      setDeleted(true);
+    }
+  }
+
+  async function DELETE() {
+    await post(props.deleteURL, deleteItem.admission, ()=>{
+      
+      deleteConformation();
+      DELETED();
+      getData(deleteItem.grade);
+      
+    },
+    ()=>{
+      alert('fail')
+    })
   }
 
   useEffect(() => {
@@ -100,7 +132,7 @@ export default function Checklist(props) {
                   Category
                 </th>
                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
-                 Address
+                  Address
                 </th>
                 <th scope="col" className="px-6 py-4 font-medium text-gray-900">
                   Acc No.
@@ -173,6 +205,19 @@ export default function Checklist(props) {
                           </Link>
                         </div>
                       </td>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-end gap-4">
+                          <button
+                            className="print-button md:inline-block bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded PHIDE"
+                            onClick={() => {
+                              setDeleteItem(item);
+                              deleteConformation();
+                            }}
+                          >
+                            DELETE
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))
                 : ""}
@@ -187,6 +232,76 @@ export default function Checklist(props) {
           )}
         </div>
       </div>
+
+      {Delete ? (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <svg
+              className="w-20 h-20 text-red-600 mx-auto mb-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 6h18M7 6l1 12a2 2 0 002 2h4a2 2 0 002-2l1-12M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"></path>
+            </svg>
+
+            <h3 className="text-xl font-normal text-gray-800 mt-5 mb-6">
+              Conform to delete {deleteItem.name}
+            </h3>
+            <div className="flex justify-center space-x-4">
+              <button
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:bg-gray-300"
+                onClick={deleteConformation}
+              >
+                Cancel
+              </button>
+              <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600" onClick={DELETE}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+
+
+
+{Deleted?
+<div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                <svg
+                    className="w-20 h-20 text-green-600 mx-auto mb-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <h3 className="text-xl font-normal text-gray-800 mt-5 mb-6">Student Deleted Successfully</h3>
+                <div className="flex justify-center space-x-4">
+                    <button
+                      
+                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:bg-gray-300"
+                        onClick={DELETED}
+                    >
+                        Close
+                    </button>
+                    <button
+                       
+                        className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600"
+                        onClick={DELETED}
+                    >
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>:''}
     </>
   );
 }
