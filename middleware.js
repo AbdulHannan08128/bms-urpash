@@ -12,6 +12,7 @@ export function middleware(request) {
   const cookie = request.cookies.get("bms-auth");
   const url = request.url;
   const path = request.nextUrl.pathname;
+  console.log(path);
   if (path=='/api') {
   if (auth == process.env.key) {
     isLoggedIn = true;
@@ -19,7 +20,7 @@ export function middleware(request) {
     isLoggedIn = false;
   }
 }
-else if (path=='/admin') {
+else if (path=='/admin'||request.nextUrl.pathname.startsWith('/admin')) {
   if (cookie) {
   if (cookie.value == process.env.key) {
     isLoggedIn = true;
@@ -67,6 +68,6 @@ else{
 }
 
 export const config = {
-  matcher: [ "/","/api", "/admin"]
+  matcher: [ "/","/api", "/admin", "/admin/:path*"]
 
-};
+}; 
