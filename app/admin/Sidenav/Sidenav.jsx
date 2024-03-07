@@ -21,8 +21,9 @@ export default function Sidenav(props) {
      setLoading(true) 
   await post(props.logout_URL, {}, ()=>{
     router.push('/');
+    setLoading(false)
   })
-     setLoading(false)
+     
 
   }
   
