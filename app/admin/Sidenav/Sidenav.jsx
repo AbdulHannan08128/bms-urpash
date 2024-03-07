@@ -1,16 +1,28 @@
 'use client'
 
+import {useState} from 'react'
 import './Sidenav.css'
+import {useRouter} from 'next/navigation'
+import {post} from '../../../functions/axios.post'
 
 import Link from 'next/link' 
 
-export default function Sidenav() {
-  
+export default function Sidenav(props) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
  function toggle(){
      document.querySelector('#sn').classList.toggle('-translate-x-80');
      document.querySelector('#sn').classList.toggle('open');
      
+
+  }
+ async function logout(){
+     setLoading(true) 
+  await post(props.logout_URL, {}, ()=>{
+    router.push('/');
+  })
+     setLoading(false)
 
   }
   
@@ -249,9 +261,36 @@ export default function Sidenav() {
           </button>
         </Link>
       </li>
+      <li>
+       
+          <button
+            className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
+            type="button"
+            fdprocessedid="ie9hpg"
+            onClick={logout}
+          >
+        <svg width="25" height="25" viewBox="10 0 135 135" xmlns="http://www.w3.org/2000/svg">
+  <path id="path1" d="M39.505192,111.30078c-21.4583,-2.79124 -23.89267,-5.62556 -17.65467,-20.555208c5.05191,-12.09091 24.60982,-21.91257 31.64435,-15.89127c8.58597,7.34927 18.3949,7.0997 26.42544,-0.67236c5.29381,-5.12343 6.8403,-3.12538 3.00035,3.87642c-4.63016,8.44269 -4.63279,19.17593 -0.007,28.145378c3.18813,6.18166 -16.91934,8.54268 -43.40858,5.09704z m 19.23103,-36.796438c-3.92227,-2.42276 -6.08556,-4.92942 -7.91909,-9.17604c-0.82246,-1.90487 -2.41893,-4.8134 -3.54772,-6.4634c-3.38391,-4.94639 -4.35576,-9.99382 -2.64965,-13.76126c0.80667,-1.78131 1.63077,-6.22222 1.83132,-9.8687c1.40895,-25.6179098 37.81394,-23.37365 40.42447,2.49205c0.2852,2.82585 0.9959,6.1258 1.57933,7.33323c2.0526,4.24795 -1.59671,13.63061 -9.77578,25.13429c-4.23698,5.95921 -13.89402,8.04618 -19.94288,4.30983z"/>
+  <path id="path2" d="M100.596,117.28386c-14.158078,-5.82951 -20.526778,-24.295448 -12.329428,-38.648468c13.571188,-23.76225 50.101948,-14.19607 50.258568,13.16003c0.11112,19.41073 -18.79713,32.46066 -36.92914,25.48744Zm19.74032,-8.09538c10.45724,-5.87729 13.21598,-22.797628 4.93837,-30.288768c-4.29393,-3.88595 -7.80157,0.40831 -4.13793,5.06588c4.88957,6.21607 2.72738,16.449868 -4.16671,19.721318c-12.86051,6.10272 -25.040138,-7.223638 -17.183378,-18.801218c4.823328,-7.10758 0.0206,-10.75821 -5.18116,-3.93831c-12.22103,16.0226 7.993958,38.209768 25.730808,28.241098z"/>
+</svg>
+
+
+            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+              logout
+            </p>
+          </button>
+        
+      </li>
     </ul>
   </div>
 </aside>
+{loading ? (
+            <div className="flex justify-center items-center w-screen h-screen absolute top-0 left-0 backdrop-blur">
+              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-gray-900 m-2"></div>
+            </div>
+          ) : (
+            ""
+          )}
 
   </>
   )

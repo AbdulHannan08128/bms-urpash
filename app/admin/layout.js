@@ -16,7 +16,7 @@ export default function AdminLayout({ children }) {
     <main>
      
       <header>
-      <Sidenav/>
+      <Sidenav logout_URL={process.env.logout_URL}/>
       </header>
 
        <div className='content'>
