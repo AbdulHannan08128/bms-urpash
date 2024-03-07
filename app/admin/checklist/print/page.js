@@ -15,7 +15,7 @@ export default function page() {
    <Title title='Print Checklist'/>
    </span>
    <PBTN/>
-   <Checklist URL={process.env.BULK_URL}/>
+   <Checklist  URL={process.env.BULK_URL} deleteURL={process.env.deleteURL}/>
    </>
   )
 }
