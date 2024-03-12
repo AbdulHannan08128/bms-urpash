@@ -12,7 +12,7 @@ export const maxDuration = 5;
 export default function AdminLayout({ children }) {
     return  (
       <>
-      
+     
     <main>
      
       <header>
@@ -21,7 +21,7 @@ export default function AdminLayout({ children }) {
 
        <div className='content'>
         
-       <div style={{ overflowY:"scroll"}}>
+       <div style={{ overflowY:"scroll"}} className='head'>
       {children}
       
       </div>

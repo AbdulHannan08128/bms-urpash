@@ -1,5 +1,5 @@
 import React from 'react'
-import Checklist from '../checklist'
+import Checklist from '../scaleChecklist'
 import Title from '../../title/Title'
 export const dynamic = "force-dynamic";
 export const dynamicParams = true;

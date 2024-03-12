@@ -116,33 +116,68 @@ export default function Sidenav(props) {
         </Link>
       </li>
       
+     
+      <ul className="mb-4 flex flex-col gap-1">
+      <li className="mx-3.5 mt-4 mb-2">
+        <Link href='/admin/exams'>
+      <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-black uppercase opacity-75">
+          exams
+        </p>
+        </Link>
+      </li>
       <li>
-        <Link className="" href="/admin/exams">
+        <Link className="" href="/admin/exams/add">
           <button
             className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
             type="button"
-            fdprocessedid="cn956l"
-            style={{ position: "relative", overflow: "hidden" }}
+            fdprocessedid="3mrx69"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-              className="w-5 h-5 text-inherit"
-            >
-              <path
-                fillRule="evenodd"
-                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 01.67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 11-.671-1.34l.041-.022zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z"
-                clipRule="evenodd"
-              />
-            </svg>
+              <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-6 w-6"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 2a1 1 0 00-1 1v6H3a1 1 0 100 2h6v6a1 1 0 102 0v-6h6a1 1 0 100-2h-6V3a1 1 0 00-1-1z"
+        clipRule="evenodd"
+      />
+    </svg>
             <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
-              exams
+              add
             </p>
           </button>
         </Link>
       </li>
+      <li>
+        <Link className="" href="/admin/exams/print">
+          <button
+            className="align-middle select-none font-sans font-bold text-center transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 rounded-lg text-blue-gray-500 hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 w-full flex items-center gap-4 px-4 capitalize"
+            type="button"
+            fdprocessedid="ie9hpg"
+          >
+            <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 6h16M4 10h16M4 14h16M4 18h16M8 6V2h8V6M12 22V18"
+      />
+    </svg>
+            <p className="block antialiased font-sans text-base leading-relaxed text-inherit font-medium capitalize">
+              print
+            </p>
+          </button>
+        </Link>
+      </li>
+    </ul>
     </ul>
     <ul className="mb-4 flex flex-col gap-1">
       <li className="mx-3.5 mt-4 mb-2">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import { useRouter } from 'next/navigation';
 function SuccessAlert({ onClose }) {
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
@@ -34,11 +34,14 @@ function SuccessAlert({ onClose }) {
 }
 
 function MyComponent(props) {
+    const router = useRouter();
     const [showSuccessAlert, setShowSuccessAlert] = useState(true);
 
     const handleClose = () => {
         setShowSuccessAlert(false);
         props.Function(false);
+        router.push('/admin')
+       
     };
 
     return (
