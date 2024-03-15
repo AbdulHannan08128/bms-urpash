@@ -3,10 +3,15 @@
 import mongoose from 'mongoose';
 
 const examSchema = new mongoose.Schema({
+  url: {
+    type: String,
+    required: true
+  },
   name: {
     type: String,
     required: false
   },
+  
   year: {
     type: String,
     required: false

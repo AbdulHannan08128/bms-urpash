@@ -19,7 +19,7 @@ export default function Home(props) {
   const onDrop = async (acceptedFiles) => {
     const file = acceptedFiles[0];
     const reader = new FileReader();
-
+  
     reader.onload = async (e) => {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: "array" });
@@ -34,16 +34,18 @@ export default function Home(props) {
   };
  
   function submit(e) {
+
+    let id = `${examName}${academicYear}`
     e.preventDefault();
     if (academicYear==''||examName==''||maxMarks=='') {
       alert('Please fill the Exam details');
     }
     else{
     
-    console.log([examName, academicYear, maxMarks,[jsonData]]);
+    console.log([id,examName, academicYear, maxMarks,[jsonData]]);
     post(
       props.BULK_URL,
-      [examName, academicYear, maxMarks,[jsonData]],
+      [id,examName, academicYear, maxMarks,[jsonData]],
       () => {
         setSuccess(true);
         

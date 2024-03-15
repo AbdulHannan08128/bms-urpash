@@ -1,7 +1,8 @@
 import React from 'react';
-
+import Link from 'next/link'
 const ExamCard = ({examName, academicYear, maxMarks}) => {
   return (
+    
     <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-300">
       <div className="relative">
         <div className="h-40 md:h-32 bg-gradient-to-r from-purple-400 to-blue-500"></div>
@@ -15,10 +16,13 @@ const ExamCard = ({examName, academicYear, maxMarks}) => {
           <div className="text-gray-700"><span className="font-semibold text-blue-500">Max Marks: </span>{maxMarks}</div>
         </div>
         <div className="text-center">
+        <Link href={'/admin/exams/'+examName+academicYear}>
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ">View Details</button>
+          </Link>
         </div>
       </div>
     </div>
+    
   );
 };
 

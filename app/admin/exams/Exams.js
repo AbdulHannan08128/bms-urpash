@@ -32,7 +32,7 @@ export default function Exams(props) {
         </>
       ))}
        {loading ? (
-            <div className="flex justify-center items-center backdrop-blur">
+            <div className="flex justify-center items-center backdrop-blur w-screen">
               <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-gray-900 m-2"></div>
             </div>
           ) : (

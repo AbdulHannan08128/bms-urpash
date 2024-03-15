@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import connectDB from "@/utils/db";
 import { addOneStudent } from "../../../dbfunctions/addOneStudent";
-import { getStudent } from "../../../dbfunctions/getStudent";
+
 connectDB();
 // addStudents([data]);
 export async function GET(req) {
@@ -14,11 +14,11 @@ export async function POST(req) {
   let file = data.get("photo");
 
   async function noPhoto() {
-    const student = await getStudent({ admission: data.get("admission") });
+  
     const newStudent = {
       roll: data.get("roll"),
       admission: data.get("admission"),
-      aadhar: data.get("aadhar"),
+      aadhar: data.get("aadhar"), 
       name: data.get("name"),
       father: data.get("father"),
       mother: data.get("mother"),
@@ -27,7 +27,6 @@ export async function POST(req) {
       dob: data.get("dob"),
       phone: data.get("phone"),
       email: data.get("email"),
-      photo: student.photo,
       address: data.get("address"),
       account: data.get("account"),
     };
@@ -42,8 +41,8 @@ export async function POST(req) {
 
     const base64Image = buffer.toString("base64");
 
-    // Create a new object without the photo property
 
+   
     const newStudent = {
       roll: data.get("roll"),
       admission: data.get("admission"),
