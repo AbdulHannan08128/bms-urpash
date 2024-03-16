@@ -111,18 +111,21 @@ export default function SearchBar(props) {
                 </div>
                 <div>
                   <span className="font-bold uppercase mb-5">
-                    Name:{student ? student.name : ""}
+                    Name:
                   </span>
+                  {student ? student.name : ""}
                 </div>
                 <div>
                   <span className="font-bold uppercase mb-5">
-                    Admission No.:{student ? student.admission : ""}
+                    Admission No.:
                   </span>
+                  {student ? student.admission : ""}
                 </div>
                 <div>
                   <span className="font-bold uppercase mb-5">
-                    Parentage:{student ? student.father : ""}
+                    Parentage:
                   </span>
+                  {student ? student.father : ""}
                 </div>
               </div>
               <div className=" grid place-items-center">
@@ -142,32 +145,74 @@ export default function SearchBar(props) {
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>English</td>
                 <td className={`${styles.td}`}>{Marks.english}</td>
-                <td className={`${styles.td}`}>Pass</td>
+                <td className={`${styles.td}`}>
+                  {" "}
+                  {parseInt(Marks.english) >
+                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
+                    ? "PASS"
+                    : "FAIL"}
+                </td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Maths</td>
                 <td className={`${styles.td}`}>{Marks.math}</td>
-                <td className={`${styles.td}`}>Pass</td>
+                <td className={`${styles.td}`}>
+                  {" "}
+                  {parseInt(Marks.math) >
+                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
+                    ? "PASS"
+                    : "FAIL"}
+                </td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Science</td>
                 <td className={`${styles.td}`}>{Marks.science}</td>
-                <td className={`${styles.td}`}>Pass</td>
+                <td className={`${styles.td}`}>
+                  {" "}
+                  {
+                    parseInt(Marks.science)
+                     >
+                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
+                    ? "PASS"
+                    : "FAIL"}
+                </td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Social Science</td>
                 <td className={`${styles.td}`}>{Marks.sst}</td>
-                <td className={`${styles.td}`}>Pass</td>
+                <td className={`${styles.td}`}>
+                  {" "}
+                  {
+                    parseInt(Marks.sst) 
+                    >
+                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
+                    ? "PASS"
+                    : "FAIL"}
+                </td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Urdu</td>
                 <td className={`${styles.td}`}>{Marks.urdu}</td>
-                <td className={`${styles.td}`}>Pass</td>
+                <td className={`${styles.td}`}>
+                  {" "}
+                  {
+                    parseInt(Marks.urdu) >
+                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
+                    ? "PASS"
+                    : "FAIL"}
+                </td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Kashmiri</td>
                 <td className={`${styles.td}`}>{Marks.kashmiri}</td>
-                <td className={`${styles.td}`}>Pass</td>
+                <td className={`${styles.td}`}>
+                  {" "}
+                  {
+                    parseInt(Marks.kashmiri) >
+                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
+                    ? "PASS"
+                    : "FAIL"}
+                </td>
               </tr>
               <tr
                 key=""
@@ -192,7 +237,18 @@ export default function SearchBar(props) {
                     parseInt(Marks.urdu) +
                     parseInt(Marks.kashmiri)}
                 </td>
-                <td className={`${styles.td}`}>Pass</td>
+                <td className={`${styles.td}`}>
+                  {" "}
+                  {parseInt(Marks.english) +
+                    parseInt(Marks.math) +
+                    parseInt(Marks.science) +
+                    parseInt(Marks.sst) +
+                    parseInt(Marks.urdu) +
+                    parseInt(Marks.kashmiri) >
+                  parseInt(MMARKS) * 6 - (30 / 100) * parseInt(MMARKS) * 6
+                    ? "PASS"
+                    : "FAIL"}
+                </td>
               </tr>
               <tr
                 key=""
@@ -201,17 +257,33 @@ export default function SearchBar(props) {
               >
                 <td className={styles.td}>Percentage</td>
                 <td className={styles.td}>
-                  {Math.round(((parseInt(Marks.english) +
-                    parseInt(Marks.math) +
-                    parseInt(Marks.science) +
-                    parseInt(Marks.sst) +
-                    parseInt(Marks.urdu) +
-                    parseInt(Marks.kashmiri)) /
-                    (parseInt(MMARKS) * 6)) *
-                    100)}
+                  {Math.round(
+                    ((parseInt(Marks.english) +
+                      parseInt(Marks.math) +
+                      parseInt(Marks.science) +
+                      parseInt(Marks.sst) +
+                      parseInt(Marks.urdu) +
+                      parseInt(Marks.kashmiri)) /
+                      (parseInt(MMARKS) * 6)) *
+                      100
+                  )}
                   %
                 </td>
-                <td className={`${styles.td}`}>Pass</td>
+                <td className={`${styles.td}`}>
+                  {" "}
+                  {Math.round(
+                    ((parseInt(Marks.english) +
+                      parseInt(Marks.math) +
+                      parseInt(Marks.science) +
+                      parseInt(Marks.sst) +
+                      parseInt(Marks.urdu) +
+                      parseInt(Marks.kashmiri)) /
+                      (parseInt(MMARKS) * 6)) *
+                      100
+                  ) > 30
+                    ? "PASS"
+                    : "FAIL"}
+                </td>
               </tr>
             </table>
           </div>
