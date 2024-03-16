@@ -38,8 +38,14 @@ body,html{
  
 }
 
+.wHIDE{
+ display: none;
+}
 
 @media print{
+  .wHIDE{
+    display: block;
+   }
   .PHIDE{
       display: none !important;
   }

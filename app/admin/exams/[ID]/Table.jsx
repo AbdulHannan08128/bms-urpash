@@ -1,17 +1,19 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios'
-
+import Link from 'next/link'
 const TableView = (props) => {
   const [selectedStudent, setSelectedStudent] = useState(null);
 
   const [data, setData] = useState([]);
+  const [dat, setDat] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
         const response = await axios.get(props.url + '?slug='+props.id);
         let exam = response.data;
+        setDat(exam);
         console.log(exam);
         const newData = [];
         await exam[0].data[0].forEach(item=> {
@@ -22,11 +24,12 @@ const TableView = (props) => {
             father:item.father,
             class:item.class,
             marks:{
-              english: item.english,
-              kashmiri: item.kashmiri,
-              math:item.math,
-              science:item.science,
-              urdu:item.urdu
+              English: item.english,
+              Kashmiri: item.kashmiri,
+              Math:item.math,
+              Science:item.science,
+              Urdu:item.urdu,
+              Social_Science:item.sst,
 
             }
            }
@@ -58,8 +61,12 @@ const TableView = (props) => {
   };
 
   return (
-    
+    <>
+    <div className='font-light text-3xl ml-24 mt-10 text-blue-700'>{dat[0]?dat[0].name:'N/A'}</div>
+    <div className='font-light text-blue-500 ml-24 mt-2'><span className='font-bold uppercase p-1'>Academic Year: </span>{dat[0]?dat[0].year:'N/A'}</div>
+    <div className='font-light text-blue-500 ml-24 mt-2 p-1'><span className='font-bold uppercase'>Max. Marks: </span>{dat[0]?dat[0].marks:'N/A'}</div>
     <div className="overflow-x-auto xl:m-20">
+      
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
@@ -76,7 +83,7 @@ const TableView = (props) => {
               Class
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Action
+              Actions
             </th>
           </tr>
         </thead>
@@ -95,10 +102,16 @@ const TableView = (props) => {
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{item.class}</div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className="px-6 py-4 whitespace-nowrap flex gap-10">
                 <button className="text-indigo-600 hover:text-indigo-900" onClick={() => handleView(item)}>
                   View
                 </button>
+                
+<Link href={`/admin/exams/${dat[0].url}/${item.admission}?exam=${dat[0].url}`}>
+                <button className="text-indigo-600 hover:text-indigo-900">
+                  Print Card
+                </button>
+                </Link>
               </td>
             </tr>
           ))}
@@ -129,6 +142,7 @@ const TableView = (props) => {
         </div>
       )}
     </div>
+    </>
    
   );
 };

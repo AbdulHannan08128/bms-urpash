@@ -102,6 +102,11 @@ export default function Checklist(props) {
       getData(grade);
       router.refresh();
     }
+
+    if (props.all) {
+      getAllData();
+      router.refresh();
+    }
   }, [grade]);
 
   return (

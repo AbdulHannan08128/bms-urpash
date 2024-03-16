@@ -22,7 +22,7 @@ export default async function page() {
 
 
 
-<LIST  URL={process.env.BULK_URL} deleteURL={process.env.deleteURL}/>
+<LIST  URL={process.env.BULK_URL} deleteURL={process.env.deleteURL} all={true}/>
   
 </>
 
