@@ -24,6 +24,14 @@ const examSchema = new mongoose.Schema({
     type: Array,
     required: false
   },
+  passPercentage:{
+    type:String,
+    required:false
+  },
+  shortName:{
+    type:String,
+    required:false
+  },
   
   
   

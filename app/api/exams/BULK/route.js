@@ -26,12 +26,12 @@ else{
 
 export async function POST(req){
   let Data = await req.json();
-  const [url,name, year, marks, data] = Data;
+  const [url,name, year, marks, data, passPercentage, shortName] = Data;
   console.log(url);
   console.log(name); 
   console.log(year);
   console.log(marks);
   console.log(Data);
-  addExam({url,name, year, marks, data});
+  addExam({url,name, year, marks, data, passPercentage, shortName});
   return NextResponse.json({exam:'add'})
 }

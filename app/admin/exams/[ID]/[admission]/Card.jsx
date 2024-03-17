@@ -8,10 +8,12 @@ export default function SearchBar(props) {
   const searchParams = useSearchParams();
   const [student, setStudent] = useState({});
   const [Marks, setMarks] = useState({});
-  const [Year, setYear] = useState({});
-  const [Name, setName] = useState({});
-  const [MMARKS, setMMARKS] = useState({});
+  const [Year, setYear] = useState();
+  const [Name, setName] = useState();
+  const [MMARKS, setMMARKS] = useState();
   const [OMARKS, setOMARKS] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [PASS, setPASS] = useState(true);
 
   const exam = searchParams.get("exam");
   async function getMarks() {
@@ -22,6 +24,7 @@ export default function SearchBar(props) {
       setMMARKS(marks.data[0].marks);
       setName(marks.data[0].name);
       setYear(marks.data[0].year);
+      setPASS(parseInt(marks.data[0].passPercentage));
       marks.data[0].data[0].forEach((mark) => {
         if (mark.admission == props.admission) {
           // console.clear();
@@ -51,6 +54,7 @@ export default function SearchBar(props) {
       // console.log(Student.data);
 
       setStudent(Student.data[0]);
+      setLoading(false);
     });
   }
 
@@ -62,29 +66,39 @@ export default function SearchBar(props) {
 
   return (
     <>
-      <div
-        className="PHIDE h-screen grid place-items-center"
-        style={{ width: "100%" }}
-      >
-        <button
-          onClick={() => window.print()}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center PHIDE m-auto"
+      {loading ? (
+        <div className="flex justify-center items-center h-screen">
+          <div className="absolute text-purple-950 font-bold">
+            GETTING READY
+          </div>
+          <div className=" rounded-full h-44 w-44 border-t-4 border-b-4 border-purple-600 animate-ping bg-purple-400"></div>
+        </div>
+      ) : (
+        <div
+          className="PHIDE h-screen grid place-items-center"
+          style={{ width: "100%" }}
         >
-          <svg
-            className="w-4 h-4 mr-2"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <button
+            onClick={() => window.print()}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center PHIDE m-auto"
           >
-            <path
-              fillRule="evenodd"
-              d="M4 5a2 2 0 012-2h8a2 2 0 012 2v5h1a2 2 0 012 2v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5a2 2 0 012-2h1V5zm3-1a1 1 0 00-1 1v5h10V5a1 1 0 00-1-1H7z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Print
-        </button>
-      </div>
+            <svg
+              className="w-4 h-4 mr-2"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4 5a2 2 0 012-2h8a2 2 0 012 2v5h1a2 2 0 012 2v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5a2 2 0 012-2h1V5zm3-1a1 1 0 00-1 1v5h10V5a1 1 0 00-1-1H7z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Print
+          </button>
+        </div>
+      )}
+
       <div className=" p-0 min-h-screen max-h-screen wHIDE">
         <div className={styles.full}>
           <div>
@@ -106,30 +120,35 @@ export default function SearchBar(props) {
                   {student ? student.grade : ""}
                 </div>
                 <div>
-                  <span className="font-bold uppercase mb-5">Roll No.:</span>
+                  <span className="font-bold uppercase mb-5">Roll No.:</span>{" "}
                   {student ? student.roll : ""}
                 </div>
                 <div>
-                  <span className="font-bold uppercase mb-5">
-                    Name:
-                  </span>
+                  <span className="font-bold uppercase mb-5">Name:</span>{" "}
                   {student ? student.name : ""}
                 </div>
                 <div>
                   <span className="font-bold uppercase mb-5">
                     Admission No.:
-                  </span>
+                  </span>{" "}
                   {student ? student.admission : ""}
                 </div>
                 <div>
-                  <span className="font-bold uppercase mb-5">
-                    Parentage:
-                  </span>
+                  <span className="font-bold uppercase mb-5">Parentage:</span>{" "}
                   {student ? student.father : ""}
                 </div>
               </div>
-              <div className=" grid place-items-center">
-                <span className={styles.photo}></span>
+              <div className={`${styles.lh}`}>
+                <div>
+                  <span className="font-bold uppercase mb-5">Examination:</span>{" "}
+                  {Name ? Name : ""}
+                </div>
+                <div>
+                  <span className="font-bold uppercase mb-5">
+                    Academic Year:
+                  </span>{" "}
+                  {Year ? Year : ""}
+                </div>
               </div>
             </div>
           </div>
@@ -140,96 +159,46 @@ export default function SearchBar(props) {
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <th className={`${styles.th}`}>Subject</th>
                 <th className={`${styles.th}`}>Marks Obtained</th>
-                <th className={`${styles.th}`}>Status</th>
+                <th className={`${styles.th}`}>Max. Marks</th>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>English</td>
                 <td className={`${styles.td}`}>{Marks.english}</td>
-                <td className={`${styles.td}`}>
-                  {" "}
-                  {parseInt(Marks.english) >
-                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
-                    ? "PASS"
-                    : "FAIL"}
-                </td>
+                <td className={`${styles.td}`}> {MMARKS ? MMARKS : ""}</td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Maths</td>
                 <td className={`${styles.td}`}>{Marks.math}</td>
-                <td className={`${styles.td}`}>
-                  {" "}
-                  {parseInt(Marks.math) >
-                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
-                    ? "PASS"
-                    : "FAIL"}
-                </td>
+                <td className={`${styles.td}`}> {MMARKS ? MMARKS : ""}</td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Science</td>
                 <td className={`${styles.td}`}>{Marks.science}</td>
-                <td className={`${styles.td}`}>
-                  {" "}
-                  {
-                    parseInt(Marks.science)
-                     >
-                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
-                    ? "PASS"
-                    : "FAIL"}
-                </td>
+                <td className={`${styles.td}`}> {MMARKS ? MMARKS : ""}</td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Social Science</td>
                 <td className={`${styles.td}`}>{Marks.sst}</td>
-                <td className={`${styles.td}`}>
-                  {" "}
-                  {
-                    parseInt(Marks.sst) 
-                    >
-                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
-                    ? "PASS"
-                    : "FAIL"}
-                </td>
+                <td className={`${styles.td}`}> {MMARKS ? MMARKS : ""}</td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Urdu</td>
                 <td className={`${styles.td}`}>{Marks.urdu}</td>
-                <td className={`${styles.td}`}>
-                  {" "}
-                  {
-                    parseInt(Marks.urdu) >
-                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
-                    ? "PASS"
-                    : "FAIL"}
-                </td>
+                <td className={`${styles.td}`}> {MMARKS ? MMARKS : ""}</td>
               </tr>
               <tr key="" className="grid grid-cols-3" style={{ width: "100%" }}>
                 <td className={`${styles.td}`}>Kashmiri</td>
                 <td className={`${styles.td}`}>{Marks.kashmiri}</td>
+                <td className={`${styles.td}`}> {MMARKS ? MMARKS : ""}</td>
+              </tr>
+              <tr
+                key=""
+                className="grid grid-cols-3 font-bold"
+                style={{ width: "100%" }}
+              >
+                <td className={`${styles.td}`}>Total</td>
                 <td className={`${styles.td}`}>
                   {" "}
-                  {
-                    parseInt(Marks.kashmiri) >
-                  parseInt(MMARKS) - (30 / 100) * parseInt(MMARKS)
-                    ? "PASS"
-                    : "FAIL"}
-                </td>
-              </tr>
-              <tr
-                key=""
-                className="grid grid-cols-3 font-bold"
-                style={{ width: "100%" }}
-              >
-                <td className={`${styles.td}`}>Total Max. Marks</td>
-                <td className={`${styles.td}`}>{parseInt(MMARKS) * 6}</td>
-                <td className={`${styles.td}`}>-</td>
-              </tr>
-              <tr
-                key=""
-                className="grid grid-cols-3 font-bold"
-                style={{ width: "100%" }}
-              >
-                <td className={`${styles.td}`}>Total Marks</td>
-                <td className={`${styles.td}`}>
                   {parseInt(Marks.english) +
                     parseInt(Marks.math) +
                     parseInt(Marks.science) +
@@ -237,19 +206,9 @@ export default function SearchBar(props) {
                     parseInt(Marks.urdu) +
                     parseInt(Marks.kashmiri)}
                 </td>
-                <td className={`${styles.td}`}>
-                  {" "}
-                  {parseInt(Marks.english) +
-                    parseInt(Marks.math) +
-                    parseInt(Marks.science) +
-                    parseInt(Marks.sst) +
-                    parseInt(Marks.urdu) +
-                    parseInt(Marks.kashmiri) >
-                  parseInt(MMARKS) * 6 - (30 / 100) * parseInt(MMARKS) * 6
-                    ? "PASS"
-                    : "FAIL"}
-                </td>
+                <td className={`${styles.td}`}>{parseInt(MMARKS) * 6}</td>
               </tr>
+
               <tr
                 key=""
                 className="grid grid-cols-3 font-bold"
@@ -271,7 +230,8 @@ export default function SearchBar(props) {
                 </td>
                 <td className={`${styles.td}`}>
                   {" "}
-                  {Math.round(
+                  100%
+                  {/* {Math.round(
                     ((parseInt(Marks.english) +
                       parseInt(Marks.math) +
                       parseInt(Marks.science) +
@@ -280,15 +240,37 @@ export default function SearchBar(props) {
                       parseInt(Marks.kashmiri)) /
                       (parseInt(MMARKS) * 6)) *
                       100
-                  ) > 30
+                  ) > PASS
+                    ? "PASS"
+                    : "FAIL"} */}
+                </td>
+              </tr>
+              <tr
+                key=""
+                className="grid grid-cols-3 font-bold"
+                style={{ width: "100%" }}
+              >
+                <td className={styles.td}>Result</td>
+                <td className={styles.td}>
+                {" "}
+                  {parseInt(Marks.english) +
+                    parseInt(Marks.math) +
+                    parseInt(Marks.science) +
+                    parseInt(Marks.sst) +
+                    parseInt(Marks.urdu) +
+                    parseInt(Marks.kashmiri) >
+                  (PASS / 100) * parseInt(MMARKS) * 6
                     ? "PASS"
                     : "FAIL"}
+                </td>
+                <td className={`${styles.td}`}>
+                  {" -"}
                 </td>
               </tr>
             </table>
           </div>
           <div>
-            <div className="grid grid-cols-3 place-items-center font-bold uppercase absolute bottom-3 w-screen">
+            <div className="grid grid-cols-3 place-items-center font-bold uppercase absolute bottom-7 w-screen">
               <span>EXAMINATION INCHARGE</span>
               <span>CHECKED BY</span>
               <span>HEADMASTER</span>
