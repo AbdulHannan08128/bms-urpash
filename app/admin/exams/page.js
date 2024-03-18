@@ -6,7 +6,7 @@ export default function page() {
   return (
     <>
     <Title title='Exams'/>
-    <div className="flex flex-wrap md:flex-row gap-6 max-w-3xl mx-auto mt-2 p-5" style={{flexWrap:'wrap'}}>
+    <div className="flex flex-col md:flex-row gap-6 max-w-3xl mx-auto mt-2 p-5">
         {/* Teacher Card */}
         <div className="flex-1">
           <div className="block bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
