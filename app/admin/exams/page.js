@@ -23,7 +23,7 @@ export default function page() {
         {/* Session Card */}
         <div className="flex-1">
           <div className="block bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
-            <Link href='/admin/checklist/session' className='block p-6'>
+            <Link href='/admin/exams/session' className='block p-6'>
               
                 <div className="uppercase text-sm text-indigo-500 font-semibold">/Session</div>
                 <p className='text-lg font-medium mt-2 hover:underline'>Print Marks Cards Yearly</p>

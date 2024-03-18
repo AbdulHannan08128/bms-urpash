@@ -93,7 +93,7 @@ export default function SESSION(props) {
           </table>
         </div>
       ) : (
-        <p>No students available for the selected academic year.</p>
+        ''
       ):''}
     </div>
   );
