@@ -1,0 +1,31 @@
+.full{
+    width: 100%;
+    max-height: 100vh;
+    min-height: 100vh;
+    border: 8px double black;
+    padding: 10px;
+}
+
+.border{
+    border:5px double black
+}
+.width_100{
+  width: 100%;
+
+}
+.photo{
+    width: 150px;
+    height: 150px;
+    border: 2px solid black;
+    display: block;
+}
+.lh{
+ line-height: 40px;
+}
+.table{
+    width: 100%;
+}
+.table, .th, .td {
+    border: 0.5px solid black;
+    padding: 5px;
+  }

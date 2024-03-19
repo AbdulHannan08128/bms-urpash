@@ -6,11 +6,18 @@ connectDB();
 // addStudents([data]);
 export async function GET(req){
   let slug = req.nextUrl.searchParams.get('slug');
+  let year = req.nextUrl.searchParams.get('year');
  
 
 
 if (slug) {
   let exams =  await getExams({url:slug});
+  console.log(exams);
+  return NextResponse.json(exams);
+  
+}
+else if (year) {
+  let exams =  await getExams({year:year});
   console.log(exams);
   return NextResponse.json(exams);
   
