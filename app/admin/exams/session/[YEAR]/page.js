@@ -1,5 +1,5 @@
 import React from 'react'
-import Card from './Card'
+import Card from './CARD_2024.jsx'
 export default function page({params}) {
   return (
     <>
