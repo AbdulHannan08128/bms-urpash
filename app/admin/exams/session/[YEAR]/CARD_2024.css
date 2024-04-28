@@ -10,6 +10,25 @@ html, body{
 
    
 }
+
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .wra {
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* Prevent content overflow */
+    }
+
+    /* Adjust font size, margins, etc. as needed to fit content on one page */
+    .page-break {
+        page-break-after: always; /* Insert page break after each section */
+    }
+}
+
 .IMG{
     width: 599px;
     height: 599px;
