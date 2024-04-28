@@ -64,6 +64,22 @@ export default function SearchBar(props) {
   if (error) {
     return <div>Error: {error}</div>;
   }
+  // Function to adjust content size for printing
+  function adjustContentSizeForPrinting() {
+    const content = document.getElementById("print"); // Replace 'content' with the ID of your content container
+    const printableHeight = window.innerHeight; // Get the height of the printable area
+
+    const contentHeight = content.offsetHeight; // Get the height of the content
+
+    // If the content height exceeds the printable height, scale it down
+    if (contentHeight > printableHeight) {
+      const scaleFactor = printableHeight / contentHeight;
+      content.style.transform = `scale(${scaleFactor})`;
+    }
+  }
+
+  // Call the function when the page is loaded
+  window.onload = adjustContentSizeForPrinting;
 
   return (
     <>
@@ -80,7 +96,10 @@ export default function SearchBar(props) {
           style={{ width: "100%" }}
         >
           <button
-            onClick={() => window.print()}
+            onClick={() => {
+              adjustContentSizeForPrinting();
+              window.print();
+            }}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center PHIDE m-auto"
           >
             <svg
@@ -100,7 +119,7 @@ export default function SearchBar(props) {
         </div>
       )}
       <div>
-        <div className="wHIDE w-screen h-screen">
+        <div className="wHIDE w-screen h-screen" id="print">
           <div className="w-screen h-screen bg-img">
             <img
               src="/LOGO-W.png"
@@ -614,7 +633,10 @@ export default function SearchBar(props) {
                   </table>
                 </div>
 
-                <div className="grade absolute flex flex-col font-bold gap-4 text-xl" style={{marginTop:'380px'}}>
+                <div
+                  className="grade absolute flex flex-col font-bold gap-4 text-xl"
+                  style={{ marginTop: "380px" }}
+                >
                   <div>OVERALL POSITION: ____________</div>
                   <div>OVERALL GRADE: ____________</div>
                 </div>
