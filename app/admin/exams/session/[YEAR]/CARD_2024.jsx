@@ -11,6 +11,7 @@ export default function SearchBar(props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [grid, setGrid] = useState("");
+  const [grade, setGrade] = useState();
 
   const admission = searchParams.get("admission");
 
@@ -61,6 +62,15 @@ export default function SearchBar(props) {
     fetchMarks();
   }, [admission, props.URL_1, props.URL_2, props.YEAR]);
 
+
+  useEffect(()=>{
+   if (student.grade==''||!student.grade) {
+      setGrade(false);
+   }
+   else{
+      setGrade(true);
+   }
+  }, [student.grade])
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -449,6 +459,9 @@ export default function SearchBar(props) {
                         )}
                       </th>
                     </tr>
+
+
+                    {grade&&
                     <tr
                       style={{ width: "100%" }}
                       className={`grid grid-col-${(
@@ -499,6 +512,7 @@ export default function SearchBar(props) {
                         )}
                       </th>
                     </tr>
+}
 
                     <tr
                       style={{ width: "100%" }}
