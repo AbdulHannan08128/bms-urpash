@@ -15,6 +15,7 @@
     "@mui/material": "^5.15.7",
     "axios": "^1.6.7",
     "fetch": "^1.1.0",
+    "html2pdf.js": "^0.10.1",
     "mongoose": "^8.1.1",
     "next": "14.1.0",
     "react": "^18",

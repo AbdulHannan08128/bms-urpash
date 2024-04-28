@@ -448,12 +448,56 @@ export default function SearchBar(props) {
                         )}
                       </th>
                     </tr>
+                    <tr
+                      style={{ width: "100%" }}
+                      className={`grid grid-col-${(
+                        parseInt(grid) * 2
+                      ).toString()}`}
+                    >
+                      <th
+                        className={`th text-left`}
+                        style={{ borderRight: "none" }}
+                      >
+                        SST
+                      </th>
+                      <th
+                        className={`th text-left`}
+                        style={{ borderLeft: "none" }}
+                      ></th>
+                      {marksData.map((mdata) => {
+                        return (
+                          <>
+                            <th className={`th text-left`}>
+                              {
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).sst
+                              }
+                            </th>
+                            <th className={`th text-left`}>{mdata.marks}</th>
+                          </>
+                        );
+                      })}
+                      <th className={`th text-left`}>
+                        {/* Displaying the total obtained marks here */}
+                        {marksData.reduce(
+                          (total, mdata) =>
+                            total +
+                            mdata.data[0].find(
+                              (ST) => ST.admission == parseInt(admission)
+                            ).sst,
 
-
-
-
-
-
+                          0
+                        )}
+                      </th>
+                      <th className={`th text-left`}>
+                        {/* Displaying the total maximum marks here */}
+                        {marksData.reduce(
+                          (total, subject) => total + parseInt(subject.marks),
+                          0
+                        )}
+                      </th>
+                    </tr>
 
                     <tr
                       style={{ width: "100%" }}
@@ -475,23 +519,30 @@ export default function SearchBar(props) {
                         return (
                           <>
                             <th className={`th text-left`}>
-                              {
-                                eval(
+                              {eval(
                                 mdata.data[0].find(
                                   (ST) => ST.admission == parseInt(admission)
-                                ).english+mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).math+mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).science+mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).urdu+mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).kashmiri
-                              )
-                              }
+                                ).english +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).math +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).science +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).urdu +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).kashmiri +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).sst
+                              )}
                             </th>
-                            <th className={`th text-left`}>{parseInt(mdata.marks)*5}</th>
+                            <th className={`th text-left`}>
+                              {parseInt(mdata.marks) * 6}
+                            </th>
                           </>
                         );
                       })}
@@ -505,53 +556,65 @@ export default function SearchBar(props) {
                             ).english,
 
                           0
-                        )+marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).math,
+                        ) +
+                          marksData.reduce(
+                            (total, mdata) =>
+                              total +
+                              mdata.data[0].find(
+                                (ST) => ST.admission == parseInt(admission)
+                              ).math,
 
-                          0
-                        )+marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).science,
+                            0
+                          ) +
+                          marksData.reduce(
+                            (total, mdata) =>
+                              total +
+                              mdata.data[0].find(
+                                (ST) => ST.admission == parseInt(admission)
+                              ).science,
 
-                          0
-                        )+marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).urdu,
+                            0
+                          ) +
+                          marksData.reduce(
+                            (total, mdata) =>
+                              total +
+                              mdata.data[0].find(
+                                (ST) => ST.admission == parseInt(admission)
+                              ).urdu,
 
-                          0
-                        )+marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).kashmiri,
+                            0
+                          ) +
+                          marksData.reduce(
+                            (total, mdata) =>
+                              total +
+                              mdata.data[0].find(
+                                (ST) => ST.admission == parseInt(admission)
+                              ).kashmiri,
 
-                          0
-                        )}
+                            0
+                          ) +
+                          marksData.reduce(
+                            (total, mdata) =>
+                              total +
+                              mdata.data[0].find(
+                                (ST) => ST.admission == parseInt(admission)
+                              ).sst,
+
+                            0
+                          )}
                       </th>
                       <th className={`th text-left`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
                           (total, subject) => total + parseInt(subject.marks),
                           0
-                        )*5}
+                        ) * 6}
                       </th>
                     </tr>
-                   
                   </table>
                 </div>
 
-                <div className="grade absolute mt-80 flex flex-col font-bold gap-4 text-xl">
+                <div className="grade absolute flex flex-col font-bold gap-4 text-xl" style={{marginTop:'380px'}}>
                   <div>OVERALL POSITION: ____________</div>
                   <div>OVERALL GRADE: ____________</div>
                 </div>
