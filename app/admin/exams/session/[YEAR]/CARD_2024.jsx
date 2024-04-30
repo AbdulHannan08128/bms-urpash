@@ -149,21 +149,40 @@ export default function SearchBar(props) {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-center uppercase tracking-tight color-blue">
-                      PROGRESS REPORT
+                      REPORT CARD
                     </h2>
                   </div>
                 </div>
               </div>
               <div className="details w-screen h-auto p-14 capitalize">
-                <div className="flex flex-col gap-4">
-                  <div className="font-bold">Name: {student.name}</div>
-                  <div className="font-bold">
-                    Father's Name: {student.father}
+                <div
+                  className="grid"
+                  style={{ gridTemplateColumns: "2fr 1fr" }}
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="font-bold uppercase">
+                      Name: {student.name}
+                    </div>
+                    <div className="font-bold uppercase">
+                      Father's Name: {student.father}
+                    </div>
+                    <div className="font-bold uppercase">
+                      Class: {student.grade}
+                    </div>
+                    <div className="font-bold uppercase">
+                      Roll No.: {student.roll}
+                    </div>
+                    <div className="font-bold uppercase">
+                      Admission No.: {student.admission}
+                    </div>
                   </div>
-                  <div className="font-bold">Class: {student.grade}</div>
-                  <div className="font-bold">Roll No.: {student.roll}</div>
-                  <div className="font-bold">
-                    Admission No.: {student.admission}
+                  <div className="flex flex-col gap-4">
+                    <div className="font-bold uppercase">
+                      Session: MARCH-2024
+                    </div>
+                    <div className="font-bold uppercase">
+                      DOB: {student.dob?student.dob.split('"')[1]:''}
+                    </div>
                   </div>
                 </div>
                 <div className="table mt-5 absolute left-10" style={{}}>
@@ -720,23 +739,138 @@ export default function SearchBar(props) {
                 </div>
 
                 <div
-                  className="grade absolute flex flex-col font-bold gap-4 text-xl"
+                  className="grade absolute grid grid-cols-2 grid-rows-3 font-bold gap-4 text-xl "
                   style={{ marginTop: "380px" }}
                 >
                   <div>
                     OVERALL RESULT:{" "}
                     <span>
-                      {((33 / 100) * grade
-                        ? marksData.reduce(
-                            (total, subject) => total + parseInt(subject.marks),
-                            0
-                          ) * 6
-                        : marksData.reduce(
-                            (total, subject) => total + parseInt(subject.marks),
-                            0
-                          ) *
-                            5 <
-                          grade
+                      {(
+                        (33 / 100) * grade
+                          ? marksData.reduce(
+                              (total, subject) =>
+                                total + parseInt(subject.marks),
+                              0
+                            ) * 6
+                          : marksData.reduce(
+                              (total, subject) =>
+                                total + parseInt(subject.marks),
+                              0
+                            ) *
+                              5 <
+                            grade
+                          ? marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).english,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).math,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).science,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).urdu,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).kashmiri,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).sst,
+
+                              0
+                            )
+                          : marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).english,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).math,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).science,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).urdu,
+
+                              0
+                            ) +
+                            marksData.reduce(
+                              (total, mdata) =>
+                                total +
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).kashmiri,
+
+                              0
+                            )
+                      ) ? (
+                        <span className=" text-green-800"> PASS</span>
+                      ) : (
+                        <span className=" text-red-800">FAIL</span>
+                      )}
+                    </span>
+                  </div>
+                  <div>OVERALL POSITION: ____________</div>
+                  <div>OVERALL GRADE: ____________</div>
+                  <div>
+                    <div>
+                      PERCENTAGE:{" "}
+                      {(((grade
                         ? marksData.reduce(
                             (total, mdata) =>
                               total +
@@ -835,19 +969,23 @@ export default function SearchBar(props) {
                               ).kashmiri,
 
                             0
-                          ))
-                        ? <span className=" text-green-800"> PASS</span>
-                        : <span className=" text-red-800">FAIL</span>}
-                    </span>
+                          )) / (grade
+                        ? marksData.reduce(
+                            (total, subject) => total + parseInt(subject.marks),
+                            0
+                          ) * 6
+                        : marksData.reduce(
+                            (total, subject) => total + parseInt(subject.marks),
+                            0
+                          ) * 5))*100).toFixed(2)}%
+                    </div>
                   </div>
-                  <div>OVERALL POSITION: ____________</div>
-                  <div>OVERALL GRADE: ____________</div>
                 </div>
-                <div className="w-screen grid grid-cols-3 font-bold absolute bottom-16 left-6">
-                  <div className="text-center">EXAMINATION INCHARGE</div>
-                  <div className="text-center">CHECKED BY</div>
-                  <div className="text-center">HEADMASTER</div>
-                </div>
+              </div>
+              <div className="w-screen grid grid-cols-3 font-bold absolute bottom-16 left-6">
+                <div className="text-center">EXAMINATION INCHARGE</div>
+                <div className="text-center">CHECKED BY</div>
+                <div className="text-center">HEADMASTER</div>
               </div>
             </div>
           </div>
