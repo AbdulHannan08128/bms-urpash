@@ -17,7 +17,7 @@ export default function SearchBar(props) {
 
   const admission = searchParams.get("admission");
 
-  const isPass = () => {
+  const isPass = async () => {
     return (
       (
         ((grade
@@ -163,7 +163,7 @@ export default function SearchBar(props) {
   useEffect(() =>{
     let PASS = isPass()>33;
     setPass(PASS);
-  }, [pass])
+  }, [pass, marksData])
   useEffect(() => {
     const fetchStudent = async () => {
       try {
@@ -297,7 +297,7 @@ export default function SearchBar(props) {
                 </div>
                 <div className="innerGRID">
                   <div>
-                    <h2 className="text-2xl font-bold text-center tracking-tight text-yellow-600">
+                    <h2 className="text-2xl font-bold text-center tracking-tight text-purple-500">
                       OFFICE OF THE HEADMASTER
                     </h2>
                   </div>
