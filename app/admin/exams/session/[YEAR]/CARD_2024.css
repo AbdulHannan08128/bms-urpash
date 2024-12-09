@@ -33,7 +33,7 @@ html, body{
     width: 599px;
     height: 599px;
     background-color: white;
-    opacity: 30%;
+    opacity: 0%;
     
 }
 .bg-img{
@@ -91,3 +91,5 @@ html, body{
     height: 100px;
     background-color: #BEBEBE;
 }
+
+

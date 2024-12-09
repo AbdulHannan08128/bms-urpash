@@ -178,7 +178,7 @@ export default function SearchBar(props) {
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="font-bold uppercase">
-                      Session: MARCH-2024
+                      Session: NOV-2024
                     </div>
                     <div className="font-bold uppercase">
                       DOB: {student.dob?student.dob.split('"')[1]:''}
@@ -189,9 +189,9 @@ export default function SearchBar(props) {
                   <table className="th">
                     <tr
                       className={`grid grid-col-${grid}`}
-                      style={{ width: "90vw" }}
+                      style={{ width: "91vw" }}
                     >
-                      <th className="uppercase th text-left">Subjects</th>
+                      <th className="uppercase th text-center">Subjects</th>
 
                       {marksData.map((mdata) => {
                         return (
@@ -245,24 +245,24 @@ export default function SearchBar(props) {
                         English
                       </th>
                       <th
-                        className={`th text-left`}
+                        className={`th text-center`}
                         style={{ borderLeft: "none" }}
                       ></th>
                       {marksData.map((mdata) => {
                         return (
                           <>
-                            <th className={`th text-left`}>
+                            <th className={`th text-center`}>
                               {
                                 mdata.data[0].find(
                                   (ST) => ST.admission == parseInt(admission)
                                 ).english
                               }
                             </th>
-                            <th className={`th text-left`}>{mdata.marks}</th>
+                            <th className={`th text-center`}>{mdata.marks}</th>
                           </>
                         );
                       })}
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
                         {marksData.reduce(
                           (total, mdata) =>
@@ -273,7 +273,7 @@ export default function SearchBar(props) {
                           0
                         )}
                       </th>
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
                           (total, subject) => total + parseInt(subject.marks),
@@ -295,24 +295,24 @@ export default function SearchBar(props) {
                         Math
                       </th>
                       <th
-                        className={`th text-left`}
+                        className={`th text-center`}
                         style={{ borderLeft: "none" }}
                       ></th>
                       {marksData.map((mdata) => {
                         return (
                           <>
-                            <th className={`th text-left`}>
+                            <th className={`th text-center`}>
                               {
                                 mdata.data[0].find(
                                   (ST) => ST.admission == parseInt(admission)
                                 ).math
                               }
                             </th>
-                            <th className={`th text-left`}>{mdata.marks}</th>
+                            <th className={`th text-center`}>{mdata.marks}</th>
                           </>
                         );
                       })}
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
                         {marksData.reduce(
                           (total, mdata) =>
@@ -324,7 +324,7 @@ export default function SearchBar(props) {
                           0
                         )}
                       </th>
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
                           (total, subject) => total + parseInt(subject.marks),
@@ -346,24 +346,24 @@ export default function SearchBar(props) {
                         {grade ? "Science" : "EVS"}
                       </th>
                       <th
-                        className={`th text-left`}
+                        className={`th text-center`}
                         style={{ borderLeft: "none" }}
                       ></th>
                       {marksData.map((mdata) => {
                         return (
                           <>
-                            <th className={`th text-left`}>
+                            <th className={`th text-center`}>
                               {
                                 mdata.data[0].find(
                                   (ST) => ST.admission == parseInt(admission)
                                 ).science
                               }
                             </th>
-                            <th className={`th text-left`}>{mdata.marks}</th>
+                            <th className={`th text-center`}>{mdata.marks}</th>
                           </>
                         );
                       })}
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
                         {marksData.reduce(
                           (total, mdata) =>
@@ -375,7 +375,7 @@ export default function SearchBar(props) {
                           0
                         )}
                       </th>
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
                           (total, subject) => total + parseInt(subject.marks),
@@ -397,24 +397,24 @@ export default function SearchBar(props) {
                         Urdu
                       </th>
                       <th
-                        className={`th text-left`}
+                        className={`th text-center`}
                         style={{ borderLeft: "none" }}
                       ></th>
                       {marksData.map((mdata) => {
                         return (
                           <>
-                            <th className={`th text-left`}>
+                            <th className={`th text-center`}>
                               {
                                 mdata.data[0].find(
                                   (ST) => ST.admission == parseInt(admission)
                                 ).urdu
                               }
                             </th>
-                            <th className={`th text-left`}>{mdata.marks}</th>
+                            <th className={`th text-center`}>{mdata.marks}</th>
                           </>
                         );
                       })}
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
                         {marksData.reduce(
                           (total, mdata) =>
@@ -426,7 +426,7 @@ export default function SearchBar(props) {
                           0
                         )}
                       </th>
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
                           (total, subject) => total + parseInt(subject.marks),
@@ -447,24 +447,24 @@ export default function SearchBar(props) {
                         Kashmiri
                       </th>
                       <th
-                        className={`th text-left`}
+                        className={`th text-center`}
                         style={{ borderLeft: "none" }}
                       ></th>
                       {marksData.map((mdata) => {
                         return (
                           <>
-                            <th className={`th text-left`}>
+                            <th className={`th text-center`}>
                               {
                                 mdata.data[0].find(
                                   (ST) => ST.admission == parseInt(admission)
                                 ).kashmiri
                               }
                             </th>
-                            <th className={`th text-left`}>{mdata.marks}</th>
+                            <th className={`th text-center`}>{mdata.marks}</th>
                           </>
                         );
                       })}
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
                         {marksData.reduce(
                           (total, mdata) =>
@@ -476,7 +476,7 @@ export default function SearchBar(props) {
                           0
                         )}
                       </th>
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
                           (total, subject) => total + parseInt(subject.marks),
@@ -499,24 +499,24 @@ export default function SearchBar(props) {
                           SST
                         </th>
                         <th
-                          className={`th text-left`}
+                          className={`th text-center`}
                           style={{ borderLeft: "none" }}
                         ></th>
                         {marksData.map((mdata) => {
                           return (
                             <>
-                              <th className={`th text-left`}>
+                              <th className={`th text-center`}>
                                 {
                                   mdata.data[0].find(
                                     (ST) => ST.admission == parseInt(admission)
                                   ).sst
                                 }
                               </th>
-                              <th className={`th text-left`}>{mdata.marks}</th>
+                              <th className={`th text-center`}>{mdata.marks}</th>
                             </>
                           );
                         })}
-                        <th className={`th text-left`}>
+                        <th className={`th text-center`}>
                           {/* Displaying the total obtained marks here */}
                           {marksData.reduce(
                             (total, mdata) =>
@@ -528,7 +528,7 @@ export default function SearchBar(props) {
                             0
                           )}
                         </th>
-                        <th className={`th text-left`}>
+                        <th className={`th text-center`}>
                           {/* Displaying the total maximum marks here */}
                           {marksData.reduce(
                             (total, subject) => total + parseInt(subject.marks),
@@ -551,13 +551,13 @@ export default function SearchBar(props) {
                         TOTAL
                       </th>
                       <th
-                        className={`th text-left`}
+                        className={`th text-center`}
                         style={{ borderLeft: "none" }}
                       ></th>
                       {marksData.map((mdata) => {
                         return (
                           <>
-                            <th className={`th text-left`}>
+                            <th className={`th text-center`}>
                               {grade
                                 ? eval(
                                     mdata.data[0].find(
@@ -608,7 +608,7 @@ export default function SearchBar(props) {
                                       ).kashmiri
                                   )}
                             </th>
-                            <th className={`th text-left`}>
+                            <th className={`th text-center`}>
                               {grade
                                 ? parseInt(mdata.marks) * 6
                                 : parseInt(mdata.marks) * 6}
@@ -616,7 +616,7 @@ export default function SearchBar(props) {
                           </>
                         );
                       })}
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
 
                         {grade
@@ -720,7 +720,7 @@ export default function SearchBar(props) {
                               0
                             )}
                       </th>
-                      <th className={`th text-left`}>
+                      <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {grade
                           ? marksData.reduce(
