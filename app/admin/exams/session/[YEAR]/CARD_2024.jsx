@@ -13,9 +13,157 @@ export default function SearchBar(props) {
   const [grid, setGrid] = useState("");
   const [grade, setGrade] = useState();
   const [isNotEVS, setNotEVS] = useState();
+  const [pass, setPass] = useState(true);
 
   const admission = searchParams.get("admission");
 
+  const isPass = () => {
+    return (
+      (
+        ((grade
+          ? marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .english,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .math,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .science,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .urdu,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .kashmiri,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .sst,
+
+              0
+            )
+          : !isNotEVS
+          ? marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .english,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .math,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .science,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .urdu,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .kashmiri,
+
+              0
+            )
+          : marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .english,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .math,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .urdu,
+
+              0
+            ) +
+            marksData.reduce(
+              (total, mdata) =>
+                total +
+                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
+                  .kashmiri,
+
+              0
+            )) /
+          (grade
+            ? marksData.reduce(
+                (total, subject) => total + parseInt(subject.marks),
+                0
+              ) * 6
+            : !isNotEVS
+            ? marksData.reduce(
+                (total, subject) => total + parseInt(subject.marks),
+                0
+              ) * 5
+            : marksData.reduce(
+                (total, subject) => total + parseInt(subject.marks),
+                0
+              ) * 4)) *
+        100
+      ).toFixed(2) > 33
+    );
+  };
+  useEffect(() =>{
+    let PASS = isPass()>33;
+    setPass(PASS);
+  }, [pass])
   useEffect(() => {
     const fetchStudent = async () => {
       try {
@@ -149,7 +297,7 @@ export default function SearchBar(props) {
                 </div>
                 <div className="innerGRID">
                   <div>
-                    <h2 className="text-2xl font-bold text-center tracking-tight">
+                    <h2 className="text-2xl font-bold text-center tracking-tight text-yellow-600">
                       OFFICE OF THE HEADMASTER
                     </h2>
                   </div>
@@ -160,7 +308,7 @@ export default function SearchBar(props) {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-center uppercase tracking-tight color-blue">
-                      REPORT CARD
+                      CERTIFICATE OF ACHIEVEMENT
                     </h2>
                   </div>
                 </div>
@@ -172,25 +320,38 @@ export default function SearchBar(props) {
                 >
                   <div className="flex flex-col gap-4">
                     <div className="font-bold uppercase">
-                      Name: {student.name}
+                      Name:{" "}
+                      <span className="text-black-700">{student.name}</span>
                     </div>
                     <div className="font-bold uppercase">
-                      Father's Name: {student.father}
+                      Father's Name:{" "}
+                      <span className="text-black-700">{student.father}</span>
                     </div>
                     <div className="font-bold uppercase">
-                      Class: {student.grade}
+                      Class:{" "}
+                      <span className="text-black-700">{student.grade}</span>
                     </div>
                     <div className="font-bold uppercase">
-                      Roll No.: {student.roll}
+                      Roll No.:{" "}
+                      <span className="text-black-700"> {student.roll}</span>
                     </div>
                     <div className="font-bold uppercase">
-                      Admission No.: {student.admission}
+                      Registration No.:{" "}
+                      <span className="text-black-700">
+                        {" "}
+                        {student.admission}
+                      </span>
                     </div>
                   </div>
                   <div className="flex flex-col gap-4">
-                    <div className="font-bold uppercase">Session: NOV-2024</div>
                     <div className="font-bold uppercase">
-                      DOB: {student.dob ? student.dob.split('"')[1] : ""}
+                      Session: <span className="text-black-700">NOV-2024</span>
+                    </div>
+                    <div className="font-bold uppercase">
+                      DOB:{" "}
+                      <span className="text-black-700">
+                        {student.dob ? student.dob.split('"')[1] : ""}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -571,7 +732,7 @@ export default function SearchBar(props) {
                       {marksData.map((mdata) => {
                         return (
                           <>
-                            <th className={`th text-center`}>
+                            <th className={`th text-center text-blue-800`}>
                               {grade
                                 ? eval(
                                     mdata.data[0].find(
@@ -641,7 +802,7 @@ export default function SearchBar(props) {
                                       ).kashmiri
                                   )}
                             </th>
-                            <th className={`th text-center`}>
+                            <th className={`th text-center `}>
                               {grade
                                 ? parseInt(mdata.marks) * 6
                                 : !isNotEVS
@@ -651,7 +812,7 @@ export default function SearchBar(props) {
                           </>
                         );
                       })}
-                      <th className={`th text-center`}>
+                      <th className={`th text-center text-blue-800`}>
                         {/* Displaying the total obtained marks here */}
 
                         {grade
@@ -792,7 +953,7 @@ export default function SearchBar(props) {
                               0
                             )}
                       </th>
-                      <th className={`th text-center`}>
+                      <th className={`th text-center `}>
                         {/* Displaying the total maximum marks here */}
                         {grade
                           ? marksData.reduce(
@@ -823,174 +984,6 @@ export default function SearchBar(props) {
                   <div>
                     OVERALL RESULT:{" "}
                     <span>
-                      {(
-                        (33 / 100) * grade
-                          ? marksData.reduce(
-                              (total, subject) =>
-                                total + parseInt(subject.marks),
-                              0
-                            ) * 6
-                          : !isNotEVS
-                          ? marksData.reduce(
-                              (total, subject) =>
-                                total + parseInt(subject.marks),
-                              0
-                            ) * 5
-                          : marksData.reduce(
-                              (total, subject) =>
-                                total + parseInt(subject.marks),
-                              0
-                            ) *
-                              4 <
-                            grade
-                          ? marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).english,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).math,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).science,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).urdu,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).kashmiri,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).sst,
-
-                              0
-                            )
-                          : !isNotEVS
-                          ? marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).english,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).math,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).science,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).urdu,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).kashmiri,
-
-                              0
-                            )
-                          : marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).english,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).math,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).urdu,
-
-                              0
-                            ) +
-                            marksData.reduce(
-                              (total, mdata) =>
-                                total +
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).kashmiri,
-
-                              0
-                            )
-                      ) ? (
-                        <span className=" text-green-800"> PASS</span>
-                      ) : (
-                        <span className=" text-red-800">FAIL</span>
-                      )}
-                    </span>
-                  </div>
-                  <div>OVERALL POSITION: ____________</div>
-                  <div>OVERALL GRADE: ____________</div>
-                  <div>
-                    <div>
-                      PERCENTAGE:{" "}
                       {(
                         ((grade
                           ? marksData.reduce(
@@ -1147,8 +1140,178 @@ export default function SearchBar(props) {
                                 0
                               ) * 4)) *
                         100
-                      ).toFixed(2)}
-                      %
+                      ).toFixed(2) > 33 ? (
+                        <span className=" text-green-800"> PASS</span>
+                      ) : (
+                        <span className=" text-red-800">FAIL</span>
+                      )}
+                    </span>
+                  </div>
+                  <div>OVERALL POSITION: ____________</div>
+                  <div>OVERALL GRADE: ____________</div>
+                  <div>
+                    <div>
+                      PERCENTAGE:{" "}
+                      <span className={pass?"text-green-800":"text-green-800"}>
+                        {(
+                          ((grade
+                            ? marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).english,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).math,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).science,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).urdu,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).kashmiri,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).sst,
+
+                                0
+                              )
+                            : !isNotEVS
+                            ? marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).english,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).math,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).science,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).urdu,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).kashmiri,
+
+                                0
+                              )
+                            : marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).english,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).math,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).urdu,
+
+                                0
+                              ) +
+                              marksData.reduce(
+                                (total, mdata) =>
+                                  total +
+                                  mdata.data[0].find(
+                                    (ST) => ST.admission == parseInt(admission)
+                                  ).kashmiri,
+
+                                0
+                              )) /
+                            (grade
+                              ? marksData.reduce(
+                                  (total, subject) =>
+                                    total + parseInt(subject.marks),
+                                  0
+                                ) * 6
+                              : !isNotEVS
+                              ? marksData.reduce(
+                                  (total, subject) =>
+                                    total + parseInt(subject.marks),
+                                  0
+                                ) * 5
+                              : marksData.reduce(
+                                  (total, subject) =>
+                                    total + parseInt(subject.marks),
+                                  0
+                                ) * 4)) *
+                          100
+                        ).toFixed(2)}
+                        %
+                      </span>
                     </div>
                   </div>
                 </div>
