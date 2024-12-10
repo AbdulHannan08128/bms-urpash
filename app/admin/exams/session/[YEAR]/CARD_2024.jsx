@@ -137,27 +137,21 @@ export default async function SearchBar(props) {
   
     // Step 6: Append rank suffix
     const rankSuffix = (n) => {
-      if (n % 100 >= 11 && n % 100 <= 13) return "th";
-      switch (n % 10) {
-        case 1:
-          return "st";
-        case 2:
-          return "nd";
-        case 3:
-          return "rd";
-        default:
-          return "Nil";
-      }
+      if (n === 1) return "st";
+      if (n === 2) return "nd";
+      if (n === 3) return "rd";
+      return "Nil"; // Return "Nil" for ranks greater than 3
     };
   
     const rankWithSuffix = `${rank}${rankSuffix(rank)}`;
-    if (rankWithSuffix.includes("Nil")) {
+    if (rankSuffix(rank) === "Nil") {
       return "Nil";
     }
     console.log("Final Rank with Suffix:", rankWithSuffix);
   
     return rankWithSuffix;
   };
+  
   
 
   const getOtherStudents = async () => {
