@@ -140,17 +140,20 @@ export default async function SearchBar(props) {
       if (n % 100 >= 11 && n % 100 <= 13) return "th";
       switch (n % 10) {
         case 1:
-          return "Ist";
+          return "st";
         case 2:
-          return "2nd";
+          return "nd";
         case 3:
-          return "3rd";
+          return "rd";
         default:
           return "Nil";
       }
     };
   
-    const rankWithSuffix = rankSuffix;
+    const rankWithSuffix = `${rank}${rankSuffix(rank)}`;
+    if (rankWithSuffix.includes("Nil")) {
+      return "Nil";
+    }
     console.log("Final Rank with Suffix:", rankWithSuffix);
   
     return rankWithSuffix;
@@ -1157,7 +1160,7 @@ export default async function SearchBar(props) {
                       )}
                     </span>
                   </div>
-                  <div>RANK: <span className={rank=="Nil" ? "text-yellow-800" : "text-green-800"}>{rank}</span></div>
+                  <div>RANK: <span className={pass&&rank=="Nil"? "text-yellow-700":pass?"text-green-800":"text-red-800"}>{rank}</span></div>
                   <div>
                     OVERALL GRADE:{" "}
                     <span className={pass ? "text-green-800" : "text-red-800"}>
