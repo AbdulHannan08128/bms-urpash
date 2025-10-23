@@ -634,7 +634,7 @@ export default async function SearchBar(props) {
                     <div className="font-bold uppercase">
                       Session:{" "}
                       <span className="text-black-700">
-                        NOV-${new Date().getFullYear()}
+                        NOV-{new Date().getFullYear()}
                       </span>
                     </div>
                     <div className="font-bold uppercase">
