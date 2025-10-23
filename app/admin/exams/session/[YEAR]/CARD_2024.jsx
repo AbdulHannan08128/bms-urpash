@@ -102,39 +102,39 @@ export default async function SearchBar(props) {
       return studentTotal;
     });
   };
- 
+
   const calculateStudentRank = (total_marks, marks_array) => {
     console.clear();
-  
+
     // Step 1: Initial input
     console.log("Initial Marks Array:", marks_array);
     console.log("Given Marks (Total Marks):", total_marks);
-  
+
     // Step 2: Filter marks_array to include only valid numbers
     const validMarks = marks_array
       .map((m) => Number(m)) // Convert to numbers
       .filter((m) => !isNaN(m) && m > 0); // Keep numbers greater than zero
     console.log("Filtered Valid Marks:", validMarks);
-  
+
     if (validMarks.length === 0) {
       console.error("No valid marks found in the array.");
       return "Invalid marks array.";
     }
-  
+
     // Step 3: Sort the marks in descending order
     const sortedMarks = [...validMarks].sort((a, b) => b - a);
     console.log("Sorted Marks (Descending Order):", sortedMarks);
-  
+
     // Step 4: Find the rank of the given total_marks
     const rank = sortedMarks.indexOf(total_marks) + 1;
     console.log(`Rank of Given Marks (${total_marks}):`, rank);
-  
+
     // Step 5: Handle edge case where total_marks is not in the array
     if (rank === 0) {
       console.error(`Marks ${total_marks} not found in the array.`);
       return `Marks ${total_marks} not found in the array.`;
     }
-  
+
     // Step 6: Append rank suffix
     const rankSuffix = (n) => {
       if (n === 1) return "st";
@@ -142,17 +142,15 @@ export default async function SearchBar(props) {
       if (n === 3) return "rd";
       return "Nil"; // Return "Nil" for ranks greater than 3
     };
-  
+
     const rankWithSuffix = `${rank}${rankSuffix(rank)}`;
     if (rankSuffix(rank) === "Nil") {
       return "Nil";
     }
     console.log("Final Rank with Suffix:", rankWithSuffix);
-  
+
     return rankWithSuffix;
   };
-  
-  
 
   const getOtherStudents = async () => {
     const ALL_EXAMS = marksData;
@@ -175,20 +173,22 @@ export default async function SearchBar(props) {
 
     // Use a Set to track unique admissions
     let uniqueAdmissions = new Set();
-    
+
     class_students.forEach((class_student) => {
       if (!uniqueAdmissions.has(class_student.admission)) {
         // Add admission to the Set
         uniqueAdmissions.add(class_student.admission);
-        
+
         // Filter students with the same admission
-        let sorted = class_students.filter((a) => a.admission === class_student.admission);
-        
+        let sorted = class_students.filter(
+          (a) => a.admission === class_student.admission
+        );
+
         // Push the unique array to sorted_students
         sorted_students.push(sorted);
       }
     });
-    
+
     console.log("Sorted Students:", sorted_students);
 
     let marks_array = [];
@@ -632,7 +632,10 @@ export default async function SearchBar(props) {
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="font-bold uppercase">
-                      Session: <span className="text-black-700">NOV-2024</span>
+                      Session:{" "}
+                      <span className="text-black-700">
+                        NOV-${new Date().getFullYear()}
+                      </span>
                     </div>
                     <div className="font-bold uppercase">
                       DOB:{" "}
@@ -1154,7 +1157,20 @@ export default async function SearchBar(props) {
                       )}
                     </span>
                   </div>
-                  <div>RANK: <span className={pass&&rank=="Nil"? "text-yellow-700":pass?"text-green-800":"text-red-800"}>{rank}</span></div>
+                  <div>
+                    RANK:{" "}
+                    <span
+                      className={
+                        pass && rank == "Nil"
+                          ? "text-yellow-700"
+                          : pass
+                          ? "text-green-800"
+                          : "text-red-800"
+                      }
+                    >
+                      {rank}
+                    </span>
+                  </div>
                   <div>
                     OVERALL GRADE:{" "}
                     <span className={pass ? "text-green-800" : "text-red-800"}>
