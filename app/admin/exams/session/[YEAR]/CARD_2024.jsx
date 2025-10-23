@@ -607,23 +607,19 @@ export default async function SearchBar(props) {
                 >
                   <div className="flex flex-col gap-4">
                     <div className="font-bold uppercase">
-                      Name:{" "}
+                      <span className="opacity-80"> Name: </span>
                       <span className="text-black-700">{student.name}</span>
                     </div>
                     <div className="font-bold uppercase">
-                      Father's Name:{" "}
+                      <span className="opacity-80">Father's Name:{" "}</span> 
                       <span className="text-black-700">{student.father}</span>
                     </div>
                     <div className="font-bold uppercase">
-                      Class:{" "}
+                     <span className="opacity-80"> Class:{" "}</span>
                       <span className="text-black-700">{student.grade}</span>
                     </div>
                     <div className="font-bold uppercase">
-                      Roll No.:{" "}
-                      <span className="text-black-700"> {student.roll}</span>
-                    </div>
-                    <div className="font-bold uppercase">
-                      Registration No.:{" "}
+                     <span className="opacity-80"> Registration No.:{" "}</span>
                       <span className="text-black-700">
                         {" "}
                         {student.admission}
@@ -632,13 +628,13 @@ export default async function SearchBar(props) {
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="font-bold uppercase">
-                      Session:{" "}
+                        <span className="opacity-80"> Session:{" "}</span>
                       <span className="text-black-700">
                         NOV-{new Date().getFullYear()}
                       </span>
                     </div>
                     <div className="font-bold uppercase">
-                      DOB:{" "}
+                     <span className="opacity-80"> DOB:{" "}</span>
                       <span className="text-black-700">
                         {student.dob ? student.dob.split('"')[1] : ""}
                       </span>
