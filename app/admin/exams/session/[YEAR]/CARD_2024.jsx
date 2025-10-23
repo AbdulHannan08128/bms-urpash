@@ -4,6 +4,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import "./CARD_2024.css";
 import { SortByAlphaOutlined } from "@mui/icons-material";
+import Image from "next/image";
 
 export default async function SearchBar(props) {
   const searchParams = useSearchParams();
@@ -611,15 +612,15 @@ export default async function SearchBar(props) {
                       <span className="text-black-700">{student.name}</span>
                     </div>
                     <div className="font-bold uppercase">
-                      <span className="opacity-80">Father's Name:{" "}</span> 
+                      <span className="opacity-80">Father's Name: </span>
                       <span className="text-black-700">{student.father}</span>
                     </div>
                     <div className="font-bold uppercase">
-                     <span className="opacity-80"> Class:{" "}</span>
+                      <span className="opacity-80"> Class: </span>
                       <span className="text-black-700">{student.grade}</span>
                     </div>
                     <div className="font-bold uppercase">
-                     <span className="opacity-80"> Registration No.:{" "}</span>
+                      <span className="opacity-80"> Registration No.: </span>
                       <span className="text-black-700">
                         {" "}
                         {student.admission}
@@ -628,13 +629,13 @@ export default async function SearchBar(props) {
                   </div>
                   <div className="flex flex-col gap-4">
                     <div className="font-bold uppercase">
-                        <span className="opacity-80"> Session:{" "}</span>
+                      <span className="opacity-80"> Session: </span>
                       <span className="text-black-700">
                         NOV-{new Date().getFullYear()}
                       </span>
                     </div>
                     <div className="font-bold uppercase">
-                     <span className="opacity-80"> DOB:{" "}</span>
+                      <span className="opacity-80"> DOB: </span>
                       <span className="text-black-700">
                         {student.dob ? student.dob.split('"')[1] : ""}
                       </span>
@@ -1186,7 +1187,18 @@ export default async function SearchBar(props) {
                 </div>
               </div>
               <div className="w-screen grid grid-cols-3 font-bold absolute bottom-16 left-6">
-                <div className="text-center">EXAMINATION INCHARGE</div>
+                <div className="text-center relative">
+                  <Image
+                    src="/incharge-sign.png"
+                    alt=""
+                    width={100}
+                    height={50}
+                    priority
+                    className="absolute top-2 left-1/2 -translate-x-1/2 -translate-y-[90%]"
+                  />
+                  EXAMINATION INCHARGE
+                </div>
+
                 <div className="text-center">CHECKED BY</div>
                 <div className="text-center">HEADMASTER</div>
               </div>
