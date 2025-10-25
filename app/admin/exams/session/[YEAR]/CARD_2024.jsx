@@ -1221,6 +1221,7 @@ export default async function SearchBar(props) {
                   HEADMASTER
                 </div>
               </div>
+              <div className=" bottom-0 fixed bg-white w-[95%] h-9 btm-wr lg:hidden"/>
             </div>
           </div>
         </div>
