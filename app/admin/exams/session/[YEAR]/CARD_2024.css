@@ -93,7 +93,9 @@ html, body{
 }
 
 .btm-wr{
-    border-top: 3px double rgba(0, 17, 255, 0.452);
+    border-bottom: 3px double rgba(0, 17, 255, 0.452);
+    border-left: 3px double rgba(0, 17, 255, 0.452);
+    border-right: 3px double rgba(0, 17, 255, 0.452);
 }
 
 
