@@ -1186,7 +1186,7 @@ export default async function SearchBar(props) {
                   </div>
                 </div>
               </div>
-              <div className="w-screen grid grid-cols-3 font-bold absolute bottom-16 left-6">
+              <div className="w-screen grid grid-cols-3 font-bold fixed bottom-16 left-6">
                 <div className="text-center relative">
                   <Image
                     src="/incharge-sign.png"
