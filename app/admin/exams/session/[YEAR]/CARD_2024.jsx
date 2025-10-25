@@ -1198,9 +1198,28 @@ export default async function SearchBar(props) {
                   />
                   EXAMINATION INCHARGE
                 </div>
-
-                <div className="text-center">CHECKED BY</div>
-                <div className="text-center">HEADMASTER</div>
+                <div className="text-center relative">
+                  <Image
+                    src="/checked-by-sign.png"
+                    alt=""
+                    width={150}
+                    height={100}
+                    priority
+                    className="absolute top-2 left-1/2 -translate-x-1/2 -translate-y-[75%]"
+                  />
+                  CHECKED BY
+                </div>
+                <div className="text-center relative">
+                  <Image
+                    src="/headmaster-sign.png"
+                    alt=""
+                    width={150}
+                    height={100}
+                    priority
+                    className="absolute top-2 left-1/2 -translate-x-1/2 -translate-y-[90%]"
+                  />
+                  HEADMASTER
+                </div>
               </div>
             </div>
           </div>
