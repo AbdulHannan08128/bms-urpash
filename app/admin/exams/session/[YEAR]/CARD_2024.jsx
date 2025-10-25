@@ -563,8 +563,8 @@ export default async function SearchBar(props) {
           </button>
         </div>
       )}
-      <div>
-        <div className="wHIDE w-screen h-screen wra">
+      <div className="">
+        <div className="wHIDE h-screen w-screen wra fixed">
           <div className="w-screen h-screen bg-img">
             <img
               src="/LOGO-W.png"
@@ -583,7 +583,7 @@ export default async function SearchBar(props) {
                     className="logo absolute left-0 top-2"
                   />
                 </div>
-                <div className="innerGRID">
+                <div className="innerGRID relative left-2">
                   <div>
                     <h2 className="text-2xl font-bold text-center tracking-tight ">
                       OFFICE OF THE HEADMASTER
