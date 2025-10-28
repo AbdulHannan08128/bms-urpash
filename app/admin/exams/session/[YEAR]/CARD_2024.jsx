@@ -1221,7 +1221,10 @@ export default async function SearchBar(props) {
                   HEADMASTER
                 </div>
               </div>
-              <div className=" bottom-8 fixed bg-white z-[999] w-[95%] h-9 btm-wr left-5"/>
+              <div className=" bottom-8 fixed bg-white z-[999] left-0 w-screen h-fit flex justify-center items-center">
+
+                <div className="w-[95%] h-9 btm-wr"/>
+              </div>
             </div>
           </div>
         </div>
