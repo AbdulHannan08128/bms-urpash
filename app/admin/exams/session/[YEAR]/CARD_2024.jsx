@@ -71,12 +71,10 @@ export default async function SearchBar(props) {
   }, [admission, props.URL_1, props.URL_2, props.YEAR]);
 
   const calculate_other_student_marks = (marksData, grade, isNotEVS) => {
-    // Define subjects based on conditions
+    // Define subjects based on conditions - NOW INCLUDING EVS FOR ALL CLASSES
     const subjects = grade
       ? ["english", "math", "science", "urdu", "kashmiri", "sst"]
-      : isNotEVS
-      ? ["english", "math", "urdu", "kashmiri"] // Exclude Science and SST
-      : ["english", "math", "science", "urdu", "kashmiri"];
+      : ["english", "math", "science", "urdu", "kashmiri"]; // EVS included for all classes
 
     console.log("Subjects to calculate:", subjects);
 
@@ -161,7 +159,7 @@ export default async function SearchBar(props) {
     ALL_EXAMS.forEach((exam) => {
       if (exam.data && Array.isArray(exam.data) && exam.data[0]) {
         exam.data[0].forEach((other_student) => {
-          if (student.grade === other_student.class) {
+          if (student.grade?.toUpperCase() === other_student.class?.toUpperCase()) {
             class_students.push(other_student);
           }
         });
@@ -205,24 +203,24 @@ export default async function SearchBar(props) {
   };
 
   useEffect(() => {
-    switch (student.grade) {
-      case "6th":
+    switch (student.grade?.toUpperCase()) {
+      case "6TH":
         setGrade(true);
         break;
-      case "7th":
+      case "7TH":
         setGrade(true);
         break;
-      case "8th":
+      case "8TH":
         setGrade(true);
         break;
 
       case "KG":
         setNotEVS(true);
         break;
-      case "Ist":
+      case "IST":
         setNotEVS(true);
         break;
-      case "2nd":
+      case "2ND":
         setNotEVS(true);
         break;
 
@@ -286,8 +284,7 @@ export default async function SearchBar(props) {
 
               0
             )
-          : !isNotEVS
-          ? marksData.reduce(
+          : marksData.reduce(
               (total, mdata) =>
                 total +
                 mdata.data[0].find((ST) => ST.admission == parseInt(admission))
@@ -326,53 +323,16 @@ export default async function SearchBar(props) {
                   .kashmiri,
 
               0
-            )
-          : marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .english,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .math,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .urdu,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .kashmiri,
-
-              0
             )) /
           (grade
             ? marksData.reduce(
                 (total, subject) => total + parseInt(subject.marks),
                 0
               ) * 6
-            : !isNotEVS
-            ? marksData.reduce(
-                (total, subject) => total + parseInt(subject.marks),
-                0
-              ) * 5
             : marksData.reduce(
                 (total, subject) => total + parseInt(subject.marks),
                 0
-              ) * 4)) *
+              ) * 5)) *
         100
       ).toFixed(2)
     );
@@ -429,8 +389,7 @@ export default async function SearchBar(props) {
 
               0
             )
-        : !isNotEVS
-        ? marksData.reduce(
+        : marksData.reduce(
             (total, mdata) =>
               total +
               mdata.data[0].find((ST) => ST.admission == parseInt(admission))
@@ -451,38 +410,6 @@ export default async function SearchBar(props) {
               total +
               mdata.data[0].find((ST) => ST.admission == parseInt(admission))
                 .science,
-
-            0
-          ) +
-          marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .urdu,
-
-            0
-          ) +
-          marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .kashmiri,
-
-            0
-          )
-        : marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .english,
-
-            0
-          ) +
-          marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .math,
 
             0
           ) +
@@ -789,60 +716,58 @@ export default async function SearchBar(props) {
                         )}
                       </th>
                     </tr>
-                    {!isNotEVS && (
-                      <tr
-                        style={{ width: "100%" }}
-                        className={`grid grid-col-${(
-                          parseInt(grid) * 2
-                        ).toString()}`}
-                      >
-                        <th
-                          className={`th text-left`}
-                          style={{ borderRight: "none" }}
-                        >
-                          {grade ? "Science" : "EVS"}
-                        </th>
-                        <th
-                          className={`th text-center`}
-                          style={{ borderLeft: "none" }}
-                        ></th>
-                        {marksData.map((mdata) => {
-                          return (
-                            <>
-                              <th className={`th text-center`}>
-                                {
-                                  mdata.data[0].find(
-                                    (ST) => ST.admission == parseInt(admission)
-                                  ).science
-                                }
-                              </th>
-                              <th className={`th text-center`}>
-                                {mdata.marks}
-                              </th>
-                            </>
-                          );
-                        })}
-                        <th className={`th text-center`}>
-                          {/* Displaying the total obtained marks here */}
-                          {marksData.reduce(
-                            (total, mdata) =>
-                              total +
-                              mdata.data[0].find(
-                                (ST) => ST.admission == parseInt(admission)
-                              ).science,
 
-                            0
-                          )}
-                        </th>
-                        <th className={`th text-center`}>
-                          {/* Displaying the total maximum marks here */}
-                          {marksData.reduce(
-                            (total, subject) => total + parseInt(subject.marks),
-                            0
-                          )}
-                        </th>
-                      </tr>
-                    )}
+                    {/* EVS/Science for ALL classes including 2nd and Ist */}
+                    <tr
+                      style={{ width: "100%" }}
+                      className={`grid grid-col-${(
+                        parseInt(grid) * 2
+                      ).toString()}`}
+                    >
+                      <th
+                        className={`th text-left`}
+                        style={{ borderRight: "none" }}
+                      >
+                        {grade ? "Science" : "EVS"}
+                      </th>
+                      <th
+                        className={`th text-center`}
+                        style={{ borderLeft: "none" }}
+                      ></th>
+                      {marksData.map((mdata) => {
+                        return (
+                          <>
+                            <th className={`th text-center`}>
+                              {
+                                mdata.data[0].find(
+                                  (ST) => ST.admission == parseInt(admission)
+                                ).science
+                              }
+                            </th>
+                            <th className={`th text-center`}>{mdata.marks}</th>
+                          </>
+                        );
+                      })}
+                      <th className={`th text-center`}>
+                        {/* Displaying the total obtained marks here */}
+                        {marksData.reduce(
+                          (total, mdata) =>
+                            total +
+                            mdata.data[0].find(
+                              (ST) => ST.admission == parseInt(admission)
+                            ).science,
+
+                          0
+                        )}
+                      </th>
+                      <th className={`th text-center`}>
+                        {/* Displaying the total maximum marks here */}
+                        {marksData.reduce(
+                          (total, subject) => total + parseInt(subject.marks),
+                          0
+                        )}
+                      </th>
+                    </tr>
 
                     <tr
                       style={{ width: "100%" }}
@@ -1053,8 +978,7 @@ export default async function SearchBar(props) {
                                           ST.admission == parseInt(admission)
                                       ).sst
                                   )
-                                : !isNotEVS
-                                ? eval(
+                                : eval(
                                     mdata.data[0].find(
                                       (ST) =>
                                         ST.admission == parseInt(admission)
@@ -1075,32 +999,12 @@ export default async function SearchBar(props) {
                                         (ST) =>
                                           ST.admission == parseInt(admission)
                                       ).kashmiri
-                                  )
-                                : eval(
-                                    mdata.data[0].find(
-                                      (ST) =>
-                                        ST.admission == parseInt(admission)
-                                    ).english +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).math +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).urdu +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).kashmiri
                                   )}
                             </th>
                             <th className={`th text-center `}>
                               {grade
                                 ? parseInt(mdata.marks) * 6
-                                : !isNotEVS
-                                ? parseInt(mdata.marks) * 5
-                                : parseInt(mdata.marks) * 4}
+                                : parseInt(mdata.marks) * 5}
                             </th>
                           </>
                         );
@@ -1124,17 +1028,11 @@ export default async function SearchBar(props) {
                                 total + parseInt(subject.marks),
                               0
                             ) * 6
-                          : !isNotEVS
-                          ? marksData.reduce(
-                              (total, subject) =>
-                                total + parseInt(subject.marks),
-                              0
-                            ) * 5
                           : marksData.reduce(
                               (total, subject) =>
                                 total + parseInt(subject.marks),
                               0
-                            ) * 4}
+                            ) * 5}
                       </th>
                     </tr>
                   </table>
