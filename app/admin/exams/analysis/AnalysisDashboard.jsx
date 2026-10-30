@@ -157,13 +157,16 @@ export default function AnalysisDashboard({ initialUrl }) {
       const percentage = totalMax > 0 ? Number(((totalMarks / totalMax) * 100).toFixed(2)) : 0;
       const pass = percentage >= 33;
 
-      let overallGrade = "F";
-      if (percentage >= 90) overallGrade = "A+";
-      else if (percentage >= 80) overallGrade = "A";
-      else if (percentage >= 70) overallGrade = "B+";
-      else if (percentage >= 60) overallGrade = "B";
-      else if (percentage >= 50) overallGrade = "C";
+      let overallGrade = "E2";
+      if (percentage >= 91) overallGrade = "A1";
+      else if (percentage >= 81) overallGrade = "A2";
+      else if (percentage >= 71) overallGrade = "B1";
+      else if (percentage >= 61) overallGrade = "B2";
+      else if (percentage >= 51) overallGrade = "C1";
+      else if (percentage >= 41) overallGrade = "C2";
       else if (percentage >= 33) overallGrade = "D";
+      else if (percentage >= 21) overallGrade = "E1";
+      else overallGrade = "E2";
 
       return {
         ...student,
@@ -265,8 +268,7 @@ export default function AnalysisDashboard({ initialUrl }) {
         highestScore: 0,
         highestStudent: null,
         lowestScore: 0,
-        lowestStudent: null,
-        gradeCounts: { "A+": 0, A: 0, "B+": 0, B: 0, C: 0, D: 0, F: 0 },
+        gradeCounts: { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0, D: 0, E1: 0, E2: 0 },
       };
     }
 
@@ -282,7 +284,7 @@ export default function AnalysisDashboard({ initialUrl }) {
     const highestStudent = sortedByPct[0] || null;
     const lowestStudent = sortedByPct[sortedByPct.length - 1] || null;
 
-    const gradeCounts = { "A+": 0, A: 0, "B+": 0, B: 0, C: 0, D: 0, F: 0 };
+    const gradeCounts = { A1: 0, A2: 0, B1: 0, B2: 0, C1: 0, C2: 0, D: 0, E1: 0, E2: 0 };
     filteredStudents.forEach((s) => {
       if (gradeCounts[s.overallGrade] !== undefined) {
         gradeCounts[s.overallGrade]++;
@@ -724,40 +726,50 @@ export default function AnalysisDashboard({ initialUrl }) {
               </div>
 
               <div className="grade-distribution-grid">
-                <div className="grade-box aplus">
-                  <div className="grade-badge-title">A+</div>
-                  <div className="text-xl font-bold">{stats.gradeCounts["A+"]}</div>
-                  <div className="text-xs opacity-75">90% - 100%</div>
+                <div className="grade-box a1">
+                  <div className="grade-badge-title">A1</div>
+                  <div className="text-xl font-bold">{stats.gradeCounts["A1"]}</div>
+                  <div className="text-xs opacity-75">91% - 100%</div>
                 </div>
-                <div className="grade-box a">
-                  <div className="grade-badge-title">A</div>
-                  <div className="text-xl font-bold">{stats.gradeCounts["A"]}</div>
-                  <div className="text-xs opacity-75">80% - 89%</div>
+                <div className="grade-box a2">
+                  <div className="grade-badge-title">A2</div>
+                  <div className="text-xl font-bold">{stats.gradeCounts["A2"]}</div>
+                  <div className="text-xs opacity-75">81% - 90%</div>
                 </div>
-                <div className="grade-box bplus">
-                  <div className="grade-badge-title">B+</div>
-                  <div className="text-xl font-bold">{stats.gradeCounts["B+"]}</div>
-                  <div className="text-xs opacity-75">70% - 79%</div>
+                <div className="grade-box b1">
+                  <div className="grade-badge-title">B1</div>
+                  <div className="text-xl font-bold">{stats.gradeCounts["B1"]}</div>
+                  <div className="text-xs opacity-75">71% - 80%</div>
                 </div>
-                <div className="grade-box b">
-                  <div className="grade-badge-title">B</div>
-                  <div className="text-xl font-bold">{stats.gradeCounts["B"]}</div>
-                  <div className="text-xs opacity-75">60% - 69%</div>
+                <div className="grade-box b2">
+                  <div className="grade-badge-title">B2</div>
+                  <div className="text-xl font-bold">{stats.gradeCounts["B2"]}</div>
+                  <div className="text-xs opacity-75">61% - 70%</div>
                 </div>
-                <div className="grade-box c">
-                  <div className="grade-badge-title">C</div>
-                  <div className="text-xl font-bold">{stats.gradeCounts["C"]}</div>
-                  <div className="text-xs opacity-75">50% - 59%</div>
+                <div className="grade-box c1">
+                  <div className="grade-badge-title">C1</div>
+                  <div className="text-xl font-bold">{stats.gradeCounts["C1"]}</div>
+                  <div className="text-xs opacity-75">51% - 60%</div>
+                </div>
+                <div className="grade-box c2">
+                  <div className="grade-badge-title">C2</div>
+                  <div className="text-xl font-bold">{stats.gradeCounts["C2"]}</div>
+                  <div className="text-xs opacity-75">41% - 50%</div>
                 </div>
                 <div className="grade-box d">
                   <div className="grade-badge-title">D</div>
                   <div className="text-xl font-bold">{stats.gradeCounts["D"]}</div>
-                  <div className="text-xs opacity-75">33% - 49%</div>
+                  <div className="text-xs opacity-75">33% - 40%</div>
                 </div>
-                <div className="grade-box fail">
-                  <div className="grade-badge-title">F</div>
-                  <div className="text-xl font-bold">{stats.gradeCounts["F"]}</div>
-                  <div className="text-xs opacity-75">&lt; 33%</div>
+                <div className="grade-box e1">
+                  <div className="grade-badge-title">E1</div>
+                  <div className="text-xl font-bold">{stats.gradeCounts["E1"]}</div>
+                  <div className="text-xs opacity-75">21% - 32%</div>
+                </div>
+                <div className="grade-box e2">
+                  <div className="grade-badge-title">E2</div>
+                  <div className="text-xl font-bold">{stats.gradeCounts["E2"]}</div>
+                  <div className="text-xs opacity-75">&lt; 21%</div>
                 </div>
               </div>
 
@@ -1154,8 +1166,10 @@ export default function AnalysisDashboard({ initialUrl }) {
                             ? "bg-emerald-100 text-emerald-800"
                             : st.overallGrade.startsWith("B")
                             ? "bg-blue-100 text-blue-800"
-                            : st.overallGrade === "C"
+                            : st.overallGrade.startsWith("C")
                             ? "bg-amber-100 text-amber-800"
+                            : st.overallGrade === "D"
+                            ? "bg-yellow-100 text-yellow-800"
                             : "bg-red-100 text-red-800"
                         }`}
                       >

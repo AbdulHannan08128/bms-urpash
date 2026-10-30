@@ -339,23 +339,25 @@ export default function SearchBar(props) {
     calculate_percentage();
     calculate_total_marks();
     getOtherStudents();
-    setPass(percentage > 33);
+    setPass(percentage >= 33);
     setOverallGrade(
-      percentage === 100
-        ? "A+" // Outstanding
-        : percentage >= 90
-        ? "A+" // Excellent
-        : percentage >= 80
-        ? "A" // Very Good
-        : percentage >= 70
-        ? "B+" // Good
-        : percentage >= 60
-        ? "B" // Above Average
-        : percentage >= 50
-        ? "C" // Average
+      percentage >= 91
+        ? "A1"
+        : percentage >= 81
+        ? "A2"
+        : percentage >= 71
+        ? "B1"
+        : percentage >= 61
+        ? "B2"
+        : percentage >= 51
+        ? "C1"
+        : percentage >= 41
+        ? "C2"
         : percentage >= 33
-        ? "D" // Below Average
-        : "F" // Fail
+        ? "D"
+        : percentage >= 21
+        ? "E1"
+        : "E2"
     );
   }, [marksData, student, grade, isNotEVS, overallGrade, percentage, pass, totalMarks]);
 
