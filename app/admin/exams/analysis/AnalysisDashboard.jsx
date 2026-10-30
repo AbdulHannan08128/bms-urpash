@@ -33,12 +33,13 @@ export default function AnalysisDashboard({ initialUrl }) {
           }
         }
       } catch (err) {
-        console.error("Error fetching exams for analysis:", err);
-        setError("Failed to load examination session records.");
+        console.error("Error fetching exams for analytics:", err);
+        setError("Failed to load exam data. Please check your network connection.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchExams();
   }, [initialUrl]);
 
@@ -53,6 +54,24 @@ export default function AnalysisDashboard({ initialUrl }) {
     return allExams.filter((e) => String(e.year) === String(selectedYear));
   }, [allExams, selectedYear]);
 
+  // Helper to generate a collision-free unique key for each student
+  const getStudentKey = (st) => {
+    const hasValidAdm =
+      st.admission !== undefined &&
+      st.admission !== null &&
+      String(st.admission).trim() !== "" &&
+      String(st.admission).toLowerCase() !== "undefined" &&
+      String(st.admission).toLowerCase() !== "null";
+
+    if (hasValidAdm) {
+      return `adm_${String(st.admission).trim()}`;
+    }
+    const cleanName = (st.name || "").trim().toLowerCase();
+    const cleanClass = (st.class || "").trim().toLowerCase();
+    const cleanFather = (st.father || "").trim().toLowerCase();
+    return `name_${cleanName}_${cleanClass}_${cleanFather}`;
+  };
+
   // Aggregate all student marks in selected session
   const processedStudents = useMemo(() => {
     if (sessionExams.length === 0) return [];
@@ -63,16 +82,24 @@ export default function AnalysisDashboard({ initialUrl }) {
     sessionExams.forEach((exam) => {
       if (exam.data && Array.isArray(exam.data) && exam.data[0]) {
         exam.data[0].forEach((st) => {
-          const admKey = String(st.admission);
+          const admKey = getStudentKey(st);
           if (!studentMap.has(admKey)) {
+            const hasValidAdm =
+              st.admission !== undefined &&
+              st.admission !== null &&
+              String(st.admission).trim() !== "" &&
+              String(st.admission).toLowerCase() !== "undefined";
+
             studentMap.set(admKey, {
-              admission: st.admission,
-              name: st.name || "Student",
-              father: st.father || "N/A",
-              class: st.class || "Unknown",
+              uniqueKey: admKey,
+              admission: hasValidAdm ? String(st.admission).trim() : "N/A",
+              name: (st.name || "Student").trim(),
+              father: (st.father || "N/A").trim(),
+              class: (st.class || "Unknown").trim(),
               examRecords: [],
             });
           }
+
           studentMap.get(admKey).examRecords.push({
             examName: exam.name,
             shortName: exam.shortName || exam.name,
@@ -117,11 +144,15 @@ export default function AnalysisDashboard({ initialUrl }) {
 
       const totalMarks = subjects.reduce((sum, sub) => sum + subjectTotals[sub], 0);
 
-      // Max marks across all session exams
-      const totalMax = sessionExams.reduce(
-        (sum, exam) => sum + (Number(exam.marks) || 0),
+      // Total max marks per subject across exams the student was evaluated in
+      const studentMaxPerSubject = student.examRecords.reduce(
+        (sum, rec) => sum + (Number(rec.maxMarks) || 0),
         0
-      ) * (senior ? 6 : 5);
+      );
+      const subjectCount = senior ? 6 : 5;
+      const totalMax = studentMaxPerSubject > 0
+        ? studentMaxPerSubject * subjectCount
+        : (senior ? 600 : 500);
 
       const percentage = totalMax > 0 ? Number(((totalMarks / totalMax) * 100).toFixed(2)) : 0;
       const pass = percentage >= 33;
@@ -164,6 +195,15 @@ export default function AnalysisDashboard({ initialUrl }) {
       });
     });
 
+    // Also compute session-wide rank based on percentage
+    const sortedPct = [...new Set(students.map((s) => s.percentage))].sort((a, b) => b - a);
+    students.forEach((s) => {
+      const sRank = sortedPct.indexOf(s.percentage) + 1;
+      s.sessionRank = sRank;
+      const suffix = (n) => (n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th");
+      s.sessionRankWithSuffix = `${sRank}${suffix(sRank)}`;
+    });
+
     return students;
   }, [sessionExams]);
 
@@ -181,7 +221,8 @@ export default function AnalysisDashboard({ initialUrl }) {
       const matchesSearch =
         query === "" ||
         st.name.toLowerCase().includes(query) ||
-        String(st.admission).includes(query);
+        String(st.admission).toLowerCase().includes(query) ||
+        st.father.toLowerCase().includes(query);
       return matchesClass && matchesSearch;
     });
   }, [processedStudents, selectedClass, searchQuery]);
@@ -199,6 +240,18 @@ export default function AnalysisDashboard({ initialUrl }) {
       return sortOrder === "asc" ? aVal - bVal : bVal - aVal;
     });
   }, [filteredStudents, sortField, sortOrder]);
+
+  // Top Rankers for Leaderboard
+  const leaderboardStudents = useMemo(() => {
+    return [...filteredStudents]
+      .sort((a, b) => {
+        if (selectedClass === "ALL") {
+          return b.percentage - a.percentage;
+        }
+        return b.totalMarks - a.totalMarks;
+      })
+      .slice(0, 15);
+  }, [filteredStudents, selectedClass]);
 
   // KPI Computations
   const stats = useMemo(() => {
@@ -223,11 +276,11 @@ export default function AnalysisDashboard({ initialUrl }) {
     const passRate = Number(((passedCount / totalStudents) * 100).toFixed(1));
 
     const totalPct = filteredStudents.reduce((sum, s) => sum + s.percentage, 0);
-    const avgPercentage = Number((totalPct / totalStudents).toFixed(2));
+    const avgPercentage = Number((totalPct / totalStudents).toFixed(1));
 
-    const sortedByMarks = [...filteredStudents].sort((a, b) => b.totalMarks - a.totalMarks);
-    const highestStudent = sortedByMarks[0];
-    const lowestStudent = sortedByMarks[sortedByMarks.length - 1];
+    const sortedByPct = [...filteredStudents].sort((a, b) => b.percentage - a.percentage);
+    const highestStudent = sortedByPct[0] || null;
+    const lowestStudent = sortedByPct[sortedByPct.length - 1] || null;
 
     const gradeCounts = { "A+": 0, A: 0, "B+": 0, B: 0, C: 0, D: 0, F: 0 };
     filteredStudents.forEach((s) => {
@@ -250,51 +303,70 @@ export default function AnalysisDashboard({ initialUrl }) {
     };
   }, [filteredStudents]);
 
-  // Class-wise Comparison
+  // Class Comparisons
   const classComparisons = useMemo(() => {
+    if (processedStudents.length === 0) return [];
+
     const map = {};
     processedStudents.forEach((st) => {
-      const cls = st.class;
+      const cls = st.class.toUpperCase();
       if (!map[cls]) {
-        map[cls] = { class: cls, count: 0, passCount: 0, totalPct: 0, students: [] };
+        map[cls] = {
+          class: st.class,
+          students: [],
+        };
       }
-      map[cls].count++;
-      if (st.pass) map[cls].passCount++;
-      map[cls].totalPct += st.percentage;
       map[cls].students.push(st);
     });
 
     return Object.values(map)
-      .map((c) => ({
-        class: c.class,
-        count: c.count,
-        passRate: Number(((c.passCount / c.count) * 100).toFixed(1)),
-        avgPercentage: Number((c.totalPct / c.count).toFixed(2)),
-        topStudent: [...c.students].sort((a, b) => b.totalMarks - a.totalMarks)[0],
-      }))
+      .map((entry) => {
+        const total = entry.students.length;
+        const passed = entry.students.filter((s) => s.pass).length;
+        const passRate = total > 0 ? Number(((passed / total) * 100).toFixed(1)) : 0;
+        const avgPct =
+          total > 0
+            ? Number(
+                (
+                  entry.students.reduce((sum, s) => sum + s.percentage, 0) / total
+                ).toFixed(1)
+              )
+            : 0;
+
+        const topStudent = [...entry.students].sort((a, b) => b.percentage - a.percentage)[0];
+
+        return {
+          class: entry.class,
+          count: total,
+          passRate,
+          avgPercentage: avgPct,
+          topStudent,
+        };
+      })
       .sort((a, b) => b.avgPercentage - a.avgPercentage);
   }, [processedStudents]);
 
-  // Subject-wise Analysis
+  // Subject Mastery Analytics
   const subjectAnalysis = useMemo(() => {
     if (filteredStudents.length === 0 || sessionExams.length === 0) return [];
-    const subjects = ["english", "math", "science", "urdu", "kashmiri", "sst"];
+
+    const subjectKeys = ["english", "math", "science", "urdu", "kashmiri", "sst"];
     const subjectNames = {
       english: "English",
       math: "Mathematics",
-      science: "Science / EVS",
+      science: "General Science",
       urdu: "Urdu",
       kashmiri: "Kashmiri",
       sst: "Social Studies (SST)",
     };
 
+    // Calculate max possible marks across the session exams for one subject
     const maxExamMarks = sessionExams.reduce((sum, e) => sum + (Number(e.marks) || 0), 0);
 
-    return subjects.map((sub) => {
-      // Filter students who took this subject (SST is only for 6th-8th)
-      const studentsTaking = filteredStudents.filter((st) => {
+    return subjectKeys.map((sub) => {
+      const studentsTaking = filteredStudents.filter((s) => {
         if (sub === "sst") {
-          const c = st.class.toUpperCase();
+          const c = s.class.toUpperCase();
           return c === "6TH" || c === "7TH" || c === "8TH";
         }
         return true;
@@ -309,6 +381,7 @@ export default function AnalysisDashboard({ initialUrl }) {
           passRate: 0,
           topScore: 0,
           count: 0,
+          maxMarks: maxExamMarks,
         };
       }
 
@@ -345,24 +418,24 @@ export default function AnalysisDashboard({ initialUrl }) {
       "Name",
       "Father's Name",
       "Class",
+      "Class Rank",
       "Total Marks",
       "Max Marks",
       "Percentage",
       "Grade",
       "Result",
-      "Class Rank",
     ];
     const rows = sortedStudents.map((s) => [
       s.admission,
       `"${s.name}"`,
       `"${s.father}"`,
       s.class,
+      s.rankWithSuffix,
       s.totalMarks,
       s.totalMax,
       `${s.percentage}%`,
       s.overallGrade,
       s.pass ? "PASS" : "FAIL",
-      s.rankWithSuffix,
     ]);
 
     const csvContent =
@@ -388,11 +461,11 @@ export default function AnalysisDashboard({ initialUrl }) {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-[70vh]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-          <p className="text-indigo-900 font-bold text-lg animate-pulse">
-            Loading Examination Analytics...
+      <div className="flex justify-center items-center h-[70vh] p-4">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-14 h-14 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+          <p className="text-indigo-950 font-bold text-base sm:text-lg animate-pulse">
+            Analyzing Academic Session Records...
           </p>
         </div>
       </div>
@@ -401,7 +474,7 @@ export default function AnalysisDashboard({ initialUrl }) {
 
   if (error) {
     return (
-      <div className="p-8 text-center bg-red-50 border border-red-200 rounded-xl m-6">
+      <div className="p-6 text-center bg-red-50 border border-red-200 rounded-xl m-4">
         <p className="text-red-700 font-bold">{error}</p>
       </div>
     );
@@ -409,6 +482,20 @@ export default function AnalysisDashboard({ initialUrl }) {
 
   return (
     <div className="analysis-container">
+      {/* Top Breadcrumb & Back Link */}
+      <div className="mb-2.5 flex items-center justify-between">
+        <Link
+          href="/admin/exams"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-900 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Exams Management
+        </Link>
+        <span className="text-xs text-slate-500 font-medium">BMS Urpash Academic Intelligence</span>
+      </div>
+
       {/* Header Banner */}
       <div className="analysis-header">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -416,7 +503,7 @@ export default function AnalysisDashboard({ initialUrl }) {
             <h1 className="analysis-header-title">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-8 h-8 text-indigo-400"
+                className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-400 flex-shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -428,20 +515,20 @@ export default function AnalysisDashboard({ initialUrl }) {
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
-              Session Exam Analytics & Intelligence
+              <span>Session Exam Intelligence & Analytics</span>
             </h1>
             <p className="analysis-header-subtitle">
-              Comprehensive performance metrics, subject mastery, class comparisons, and merit rankings.
+              Comprehensive performance evaluation, subject mastery breakdown, class benchmarks, and merit leaderboards.
             </p>
           </div>
 
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2.5 rounded-lg shadow-md transition-all active:scale-95 text-sm"
+            className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2.5 rounded-lg shadow-md transition-all active:scale-95 text-xs sm:text-sm w-full md:w-auto"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
+              className="w-4 h-4 flex-shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -490,7 +577,7 @@ export default function AnalysisDashboard({ initialUrl }) {
             </select>
           </div>
 
-          <div className="relative ml-auto">
+          <div className="relative analysis-search-wrapper md:ml-auto">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -509,7 +596,7 @@ export default function AnalysisDashboard({ initialUrl }) {
             </span>
             <input
               type="text"
-              placeholder="Search student or admission..."
+              placeholder="Search candidate name or admission..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="analysis-search-input"
@@ -522,103 +609,105 @@ export default function AnalysisDashboard({ initialUrl }) {
       <div className="kpi-grid">
         <div className="kpi-card purple">
           <div className="kpi-card-header">
-            <span className="kpi-title">Evaluated Students</span>
+            <span className="kpi-title">Examinees</span>
             <div className="kpi-icon purple">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
           </div>
           <div className="kpi-value">{stats.totalStudents}</div>
           <div className="kpi-subtitle">
-            Across {sessionExams.length} exams in session {selectedYear}
+            {sessionExams.length} exams &bull; {selectedClass === "ALL" ? "All grades" : `Class ${selectedClass}`}
           </div>
         </div>
 
         <div className="kpi-card emerald">
           <div className="kpi-card-header">
-            <span className="kpi-title">Overall Pass Rate</span>
+            <span className="kpi-title">Pass Rate</span>
             <div className="kpi-icon emerald">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
           <div className="kpi-value">{stats.passRate}%</div>
-          <div className="kpi-subtitle text-emerald-600 font-semibold">
-            {stats.passedCount} Passed &bull; {stats.failedCount} Needs Support
+          <div className="kpi-subtitle text-emerald-700 font-semibold">
+            {stats.passedCount} Passed &bull; {stats.failedCount} Alerts
           </div>
         </div>
 
         <div className="kpi-card blue">
           <div className="kpi-card-header">
-            <span className="kpi-title">Session Mean Score</span>
+            <span className="kpi-title">Average Mean</span>
             <div className="kpi-icon blue">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
           </div>
           <div className="kpi-value">{stats.avgPercentage}%</div>
           <div className="kpi-subtitle">
-            Average across all subjects and grades
+            Mean aggregate performance
           </div>
         </div>
 
         <div className="kpi-card amber">
           <div className="kpi-card-header">
-            <span className="kpi-title">Top Achiever</span>
+            <span className="kpi-title">Session Topper</span>
             <div className="kpi-icon amber">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
               </svg>
             </div>
           </div>
           <div className="kpi-value">{stats.highestScore}%</div>
-          <div className="kpi-subtitle truncate font-semibold text-amber-700">
+          <div className="kpi-subtitle truncate font-medium text-amber-800">
             {stats.highestStudent ? `${stats.highestStudent.name} (${stats.highestStudent.class})` : "N/A"}
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="analysis-tabs">
-        <button
-          onClick={() => setActiveTab("overview")}
-          className={`analysis-tab-btn ${activeTab === "overview" ? "active" : ""}`}
-        >
-          <span>📊</span> Overview & Insights
-        </button>
-        <button
-          onClick={() => setActiveTab("subjects")}
-          className={`analysis-tab-btn ${activeTab === "subjects" ? "active" : ""}`}
-        >
-          <span>📚</span> Subject Mastery
-        </button>
-        <button
-          onClick={() => setActiveTab("classes")}
-          className={`analysis-tab-btn ${activeTab === "classes" ? "active" : ""}`}
-        >
-          <span>🏫</span> Class Benchmarks
-        </button>
-        <button
-          onClick={() => setActiveTab("leaderboard")}
-          className={`analysis-tab-btn ${activeTab === "leaderboard" ? "active" : ""}`}
-        >
-          <span>🏆</span> Merit Leaderboard
-        </button>
-        <button
-          onClick={() => setActiveTab("registry")}
-          className={`analysis-tab-btn ${activeTab === "registry" ? "active" : ""}`}
-        >
-          <span>📋</span> Student Registry ({filteredStudents.length})
-        </button>
-        <button
-          onClick={() => setActiveTab("alerts")}
-          className={`analysis-tab-btn ${activeTab === "alerts" ? "active" : ""}`}
-        >
-          <span>⚠️</span> Support Alerts ({stats.failedCount})
-        </button>
+      {/* Sticky Pill Navigation Tabs */}
+      <div className="analysis-tabs-wrapper">
+        <div className="analysis-tabs">
+          <button
+            onClick={() => setActiveTab("overview")}
+            className={`analysis-tab-btn ${activeTab === "overview" ? "active" : ""}`}
+          >
+            <span>📊</span> Overview & Insights
+          </button>
+          <button
+            onClick={() => setActiveTab("leaderboard")}
+            className={`analysis-tab-btn ${activeTab === "leaderboard" ? "active" : ""}`}
+          >
+            <span>🏆</span> Merit Leaderboard
+          </button>
+          <button
+            onClick={() => setActiveTab("subjects")}
+            className={`analysis-tab-btn ${activeTab === "subjects" ? "active" : ""}`}
+          >
+            <span>📚</span> Subject Mastery
+          </button>
+          <button
+            onClick={() => setActiveTab("classes")}
+            className={`analysis-tab-btn ${activeTab === "classes" ? "active" : ""}`}
+          >
+            <span>🏫</span> Class Benchmarks
+          </button>
+          <button
+            onClick={() => setActiveTab("registry")}
+            className={`analysis-tab-btn ${activeTab === "registry" ? "active" : ""}`}
+          >
+            <span>📋</span> Student Registry ({filteredStudents.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("alerts")}
+            className={`analysis-tab-btn ${activeTab === "alerts" ? "active" : ""}`}
+          >
+            <span>⚠️</span> Remedial Support ({stats.failedCount})
+          </button>
+        </div>
       </div>
 
       {/* TAB 1: OVERVIEW & INSIGHTS */}
@@ -672,130 +761,157 @@ export default function AnalysisDashboard({ initialUrl }) {
                 </div>
               </div>
 
-              {/* Progress Stack Bar */}
-              <div className="mt-6">
-                <div className="text-xs font-bold text-slate-500 uppercase mb-2">Overall Student Quality Spread</div>
-                <div className="w-full h-4 bg-slate-100 rounded-full flex overflow-hidden">
-                  {stats.totalStudents > 0 && (
-                    <>
-                      <div
-                        style={{ width: `${(stats.gradeCounts["A+"] / stats.totalStudents) * 100}%` }}
-                        className="bg-emerald-500"
-                        title={`A+: ${stats.gradeCounts["A+"]}`}
-                      ></div>
-                      <div
-                        style={{ width: `${(stats.gradeCounts["A"] / stats.totalStudents) * 100}%` }}
-                        className="bg-green-500"
-                        title={`A: ${stats.gradeCounts["A"]}`}
-                      ></div>
-                      <div
-                        style={{ width: `${(stats.gradeCounts["B+"] / stats.totalStudents) * 100}%` }}
-                        className="bg-blue-500"
-                        title={`B+: ${stats.gradeCounts["B+"]}`}
-                      ></div>
-                      <div
-                        style={{ width: `${(stats.gradeCounts["B"] / stats.totalStudents) * 100}%` }}
-                        className="bg-sky-400"
-                        title={`B: ${stats.gradeCounts["B"]}`}
-                      ></div>
-                      <div
-                        style={{ width: `${(stats.gradeCounts["C"] / stats.totalStudents) * 100}%` }}
-                        className="bg-amber-400"
-                        title={`C: ${stats.gradeCounts["C"]}`}
-                      ></div>
-                      <div
-                        style={{ width: `${(stats.gradeCounts["D"] / stats.totalStudents) * 100}%` }}
-                        className="bg-orange-400"
-                        title={`D: ${stats.gradeCounts["D"]}`}
-                      ></div>
-                      <div
-                        style={{ width: `${(stats.gradeCounts["F"] / stats.totalStudents) * 100}%` }}
-                        className="bg-red-500"
-                        title={`F: ${stats.gradeCounts["F"]}`}
-                      ></div>
-                    </>
-                  )}
-                </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap justify-between items-center text-xs text-slate-500 gap-2">
+                <span>Pass Standard: 33% per subject</span>
+                <span className="font-semibold text-indigo-700">
+                  {stats.passedCount} / {stats.totalStudents} Candidates Cleared
+                </span>
               </div>
             </div>
 
-            {/* Quick Class Rank Comparison */}
+            {/* Quick Insights & Academic Highlights */}
             <div className="analysis-panel">
               <div className="panel-header">
                 <div>
-                  <h3 className="panel-title">Class Performance Comparison</h3>
-                  <p className="panel-subtitle">Average score across academic grades in {selectedYear}</p>
+                  <h3 className="panel-title">Academic Highlights & Health</h3>
+                  <p className="panel-subtitle">Summary metrics for Session {selectedYear}</p>
                 </div>
               </div>
 
-              <div>
-                {classComparisons.map((item, idx) => (
-                  <div key={item.class} className="chart-bar-group">
-                    <div className="chart-bar-label">
-                      <span>Class {item.class} ({item.count} students)</span>
-                      <span className="text-indigo-600 font-bold">{item.avgPercentage}% avg &bull; {item.passRate}% pass</span>
-                    </div>
-                    <div className="chart-bar-track">
-                      <div
-                        className={`chart-bar-fill ${
-                          idx % 3 === 0 ? "purple" : idx % 3 === 1 ? "blue" : "emerald"
-                        }`}
-                        style={{ width: `${Math.min(item.avgPercentage, 100)}%` }}
-                      ></div>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🥇</span>
+                    <div>
+                      <div className="font-bold text-slate-900 text-sm">
+                        {stats.highestStudent ? stats.highestStudent.name : "N/A"}
+                      </div>
+                      <div className="text-xs text-slate-500">
+                        {stats.highestStudent ? `Class ${stats.highestStudent.class}` : "N/A"}
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Subject Strengths */}
-          <div className="analysis-panel">
-            <div className="panel-header">
-              <div>
-                <h3 className="panel-title">Subject Performance Snapshot</h3>
-                <p className="panel-subtitle">Mean performance across major curricular subjects</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {subjectAnalysis.map((sub) => (
-                <div key={sub.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-slate-800">{sub.name}</span>
-                    <span className="text-xs bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded">
-                      {sub.count} Students
+                  <div className="text-right">
+                    <span className="font-black text-indigo-700 text-base">
+                      {stats.highestScore}%
                     </span>
-                  </div>
-                  <div className="text-2xl font-black text-slate-900 mb-2">
-                    {sub.avgScore} <span className="text-xs text-slate-500 font-normal">/ {sub.maxMarks} ({sub.avgPct}%)</span>
-                  </div>
-                  <div className="chart-bar-track mb-2">
-                    <div
-                      className={`chart-bar-fill ${
-                        sub.passRate >= 80 ? "emerald" : sub.passRate >= 60 ? "blue" : "amber"
-                      }`}
-                      style={{ width: `${Math.min(sub.avgPct, 100)}%` }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between text-xs text-slate-500">
-                    <span>Pass Rate: <strong className="text-slate-800">{sub.passRate}%</strong></span>
-                    <span>Top: <strong className="text-slate-800">{sub.topScore}</strong></span>
+                    <span className="text-xs block text-emerald-600 font-bold">Top Score</span>
                   </div>
                 </div>
-              ))}
+
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🏫</span>
+                    <div>
+                      <div className="font-bold text-slate-900 text-sm">Top Performing Class</div>
+                      <div className="text-xs text-slate-500">
+                        {classComparisons[0] ? `Class ${classComparisons[0].class} (${classComparisons[0].count} students)` : "N/A"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-black text-emerald-700 text-base">
+                      {classComparisons[0] ? `${classComparisons[0].avgPercentage}%` : "0%"}
+                    </span>
+                    <span className="text-xs block text-slate-400 font-medium">Mean Score</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">⚠️</span>
+                    <div>
+                      <div className="font-bold text-slate-900 text-sm">Intervention Required</div>
+                      <div className="text-xs text-slate-500">Students below passing mark</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-black text-rose-600 text-base">{stats.failedCount}</span>
+                    <span className="text-xs block text-rose-500 font-medium">Need Support</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </>
       )}
 
-      {/* TAB 2: SUBJECT DEEP-DIVE */}
+      {/* TAB 2: MERIT LEADERBOARD */}
+      {activeTab === "leaderboard" && (
+        <div className="analysis-panel">
+          <div className="panel-header">
+            <div>
+              <h3 className="panel-title">Academic Merit & Top Rankers</h3>
+              <p className="panel-subtitle">
+                {selectedClass === "ALL"
+                  ? `Rankings based on overall percentage across all classes for session ${selectedYear}`
+                  : `Leading students in Class ${selectedClass} for session ${selectedYear}`}
+              </p>
+            </div>
+          </div>
+
+          <div className="leaderboard-list">
+            {leaderboardStudents.map((st, idx) => (
+              <div
+                key={st.uniqueKey}
+                className={`leaderboard-item ${
+                  idx === 0 ? "rank-1" : idx === 1 ? "rank-2" : idx === 2 ? "rank-3" : ""
+                }`}
+              >
+                <div className="leaderboard-header">
+                  <div
+                    className={`rank-badge ${
+                      idx === 0
+                        ? "rank-1"
+                        : idx === 1
+                        ? "rank-2"
+                        : idx === 2
+                        ? "rank-3"
+                        : "standard"
+                    }`}
+                  >
+                    {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-slate-900 text-sm sm:text-base truncate">{st.name}</h4>
+                    <p className="text-xs text-slate-500 truncate">
+                      Class {st.class} &bull; Class Rank: {st.rankWithSuffix} &bull; {st.admission !== "N/A" ? `Roll #${st.admission}` : `S/O ${st.father}`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="leaderboard-meta">
+                  <div className="text-left sm:text-right">
+                    <div className="font-black text-indigo-700 text-base sm:text-lg">
+                      {st.totalMarks} <span className="text-xs text-slate-400">/ {st.totalMax}</span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-500">
+                      {st.percentage}% &bull; Grade {st.overallGrade}
+                    </div>
+                  </div>
+
+                  <Link
+                    href={`/admin/exams/session/${selectedYear}?admission=${
+                      st.admission !== "N/A" ? st.admission : encodeURIComponent(st.name)
+                    }`}
+                    className="btn-action"
+                  >
+                    Print Card
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: SUBJECT MASTERY */}
       {activeTab === "subjects" && (
         <div className="analysis-panel">
           <div className="panel-header">
             <div>
-              <h3 className="panel-title">Curricular Subject Mastery Matrix</h3>
-              <p className="panel-subtitle">Comprehensive breakdown by subject across all exams in {selectedYear}</p>
+              <h3 className="panel-title">Subject Mastery & Curricular Breakdown</h3>
+              <p className="panel-subtitle">Comparative performance metrics across all evaluated subjects</p>
             </div>
           </div>
 
@@ -823,7 +939,7 @@ export default function AnalysisDashboard({ initialUrl }) {
                     </td>
                     <td>
                       <div className="flex items-center gap-2">
-                        <div className="w-24 bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div className="w-20 bg-slate-100 h-2 rounded-full overflow-hidden">
                           <div
                             className={`h-full ${
                               sub.avgPct >= 70 ? "bg-emerald-500" : sub.avgPct >= 50 ? "bg-blue-500" : "bg-amber-500"
@@ -861,7 +977,7 @@ export default function AnalysisDashboard({ initialUrl }) {
         </div>
       )}
 
-      {/* TAB 3: CLASS BENCHMARKS */}
+      {/* TAB 4: CLASS BENCHMARKS */}
       {activeTab === "classes" && (
         <div className="analysis-panel">
           <div className="panel-header">
@@ -922,72 +1038,6 @@ export default function AnalysisDashboard({ initialUrl }) {
         </div>
       )}
 
-      {/* TAB 4: MERIT LEADERBOARD */}
-      {activeTab === "leaderboard" && (
-        <div className="analysis-panel">
-          <div className="panel-header">
-            <div>
-              <h3 className="panel-title">Academic Merit & Top Rankers</h3>
-              <p className="panel-subtitle">Leading students in {selectedClass === "ALL" ? "All Classes" : `Class ${selectedClass}`} for session {selectedYear}</p>
-            </div>
-          </div>
-
-          <div className="leaderboard-list">
-            {[...filteredStudents]
-              .sort((a, b) => b.totalMarks - a.totalMarks)
-              .slice(0, 10)
-              .map((st, idx) => (
-                <div
-                  key={st.admission}
-                  className={`leaderboard-item ${
-                    idx === 0 ? "rank-1" : idx === 1 ? "rank-2" : idx === 2 ? "rank-3" : ""
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`rank-badge ${
-                        idx === 0
-                          ? "rank-1"
-                          : idx === 1
-                          ? "rank-2"
-                          : idx === 2
-                          ? "rank-3"
-                          : "standard"
-                      }`}
-                    >
-                      {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-base">{st.name}</h4>
-                      <p className="text-xs text-slate-500">
-                        Class {st.class} &bull; Roll #{st.admission} &bull; S/O {st.father}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-6">
-                    <div className="text-right">
-                      <div className="font-black text-indigo-700 text-lg">
-                        {st.totalMarks} <span className="text-xs text-slate-400">/ {st.totalMax}</span>
-                      </div>
-                      <div className="text-xs font-bold text-slate-500">
-                        {st.percentage}% &bull; Grade {st.overallGrade}
-                      </div>
-                    </div>
-
-                    <Link
-                      href={`/admin/exams/session/${selectedYear}?admission=${st.admission}`}
-                      className="btn-action"
-                    >
-                      Print Card
-                    </Link>
-                  </div>
-                </div>
-              ))}
-          </div>
-        </div>
-      )}
-
       {/* TAB 5: STUDENT REGISTRY */}
       {activeTab === "registry" && (
         <div className="analysis-panel">
@@ -995,17 +1045,70 @@ export default function AnalysisDashboard({ initialUrl }) {
             <div>
               <h3 className="panel-title">Student Academic Registry</h3>
               <p className="panel-subtitle">
-                Showing {sortedStudents.length} candidate records for session {selectedYear}
+                Showing {sortedStudents.length} candidate records for session {selectedYear} ({selectedClass === "ALL" ? "All Classes" : `Class ${selectedClass}`})
               </p>
             </div>
           </div>
 
-          <div className="data-table-wrapper">
+          {/* Mobile Card View (< 768px) */}
+          <div className="mobile-student-grid">
+            {sortedStudents.map((st) => (
+              <div key={st.uniqueKey} className="student-card">
+                <div className="student-card-header">
+                  <div className="min-w-0">
+                    <div className="font-bold text-slate-900 text-sm truncate">{st.name}</div>
+                    <div className="text-xs text-slate-500 truncate">
+                      Class {st.class} &bull; {st.admission !== "N/A" ? `Adm #${st.admission}` : `S/O ${st.father}`}
+                    </div>
+                  </div>
+                  <span className={`badge-tag ${st.pass ? "pass" : "fail"}`}>
+                    {st.pass ? "PASS" : "FAIL"}
+                  </span>
+                </div>
+
+                <div className="student-card-body">
+                  <div>
+                    <span className="text-xs text-slate-400 block">Class Rank</span>
+                    <span className="font-bold text-slate-800">{st.rankWithSuffix}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-slate-400 block">Marks Scored</span>
+                    <span className="font-bold text-indigo-700">
+                      {st.totalMarks} <span className="text-xs text-slate-400">/ {st.totalMax}</span>
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-slate-400 block">Percentage</span>
+                    <span className="font-bold text-slate-800">{st.percentage}%</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-slate-400 block">Grade</span>
+                    <span className="font-bold text-emerald-700">{st.overallGrade}</span>
+                  </div>
+                </div>
+
+                <div className="student-card-footer">
+                  <span className="text-xs text-slate-400">Session {selectedYear}</span>
+                  <Link
+                    href={`/admin/exams/session/${selectedYear}?admission=${
+                      st.admission !== "N/A" ? st.admission : encodeURIComponent(st.name)
+                    }`}
+                    className="btn-action"
+                  >
+                    Print Card
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View (>= 769px) */}
+          <div className="data-table-wrapper desktop-table-only">
             <table className="analytics-table">
               <thead>
                 <tr>
                   <th onClick={() => handleSort("classRank")} className="cursor-pointer">
-                    Rank {sortField === "classRank" && (sortOrder === "asc" ? "▲" : "▼")}
+                    Class Rank {sortField === "classRank" && (sortOrder === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("admission")} className="cursor-pointer">
                     Admission {sortField === "admission" && (sortOrder === "asc" ? "▲" : "▼")}
@@ -1029,7 +1132,7 @@ export default function AnalysisDashboard({ initialUrl }) {
               </thead>
               <tbody>
                 {sortedStudents.map((st) => (
-                  <tr key={st.admission}>
+                  <tr key={st.uniqueKey}>
                     <td className="font-bold text-slate-700">{st.rankWithSuffix}</td>
                     <td className="font-mono text-xs text-slate-600">{st.admission}</td>
                     <td>
@@ -1066,7 +1169,9 @@ export default function AnalysisDashboard({ initialUrl }) {
                     </td>
                     <td>
                       <Link
-                        href={`/admin/exams/session/${selectedYear}?admission=${st.admission}`}
+                        href={`/admin/exams/session/${selectedYear}?admission=${
+                          st.admission !== "N/A" ? st.admission : encodeURIComponent(st.name)
+                        }`}
                         className="text-indigo-600 hover:text-indigo-900 text-xs font-bold underline"
                       >
                         Print Card
@@ -1116,7 +1221,7 @@ export default function AnalysisDashboard({ initialUrl }) {
                   {filteredStudents
                     .filter((s) => !s.pass)
                     .map((st) => (
-                      <tr key={st.admission} className="bg-rose-50/50">
+                      <tr key={st.uniqueKey} className="bg-rose-50/50">
                         <td className="font-mono text-xs">{st.admission}</td>
                         <td className="font-bold text-slate-900">{st.name}</td>
                         <td className="font-semibold">{st.class}</td>
@@ -1138,7 +1243,9 @@ export default function AnalysisDashboard({ initialUrl }) {
                         </td>
                         <td>
                           <Link
-                            href={`/admin/exams/session/${selectedYear}?admission=${st.admission}`}
+                            href={`/admin/exams/session/${selectedYear}?admission=${
+                              st.admission !== "N/A" ? st.admission : encodeURIComponent(st.name)
+                            }`}
                             className="btn-action bg-rose-600 hover:bg-rose-700"
                           >
                             Card Details

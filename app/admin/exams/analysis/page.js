@@ -1,5 +1,4 @@
 import React from 'react'
-import Title from '../../title/Title'
 import AnalysisDashboard from './AnalysisDashboard'
 
 export const metadata = {
@@ -8,10 +7,5 @@ export const metadata = {
 }
 
 export default function ExamAnalysisPage() {
-  return (
-    <>
-      <Title title="Session Exam Intelligence & Analytics" />
-      <AnalysisDashboard initialUrl={process.env.add_Exam_URL || '/api/exams/BULK'} />
-    </>
-  )
+  return <AnalysisDashboard initialUrl={process.env.add_Exam_URL || '/api/exams/BULK'} />
 }
