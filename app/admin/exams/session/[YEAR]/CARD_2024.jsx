@@ -6,7 +6,7 @@ import "./CARD_2024.css";
 import { SortByAlphaOutlined } from "@mui/icons-material";
 import Image from "next/image";
 
-export default async function SearchBar(props) {
+export default function SearchBar(props) {
   const searchParams = useSearchParams();
   const [student, setStudent] = useState({});
   const [marksData, setMarksData] = useState([]);
@@ -281,9 +281,6 @@ export default async function SearchBar(props) {
         break;
     }
   }, [student.grade, marksData, admission]);
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   const getSubjectMark = (mdata, subject) => {
     if (!mdata || !mdata.data || !Array.isArray(mdata.data) || !mdata.data[0]) return 0;
@@ -377,6 +374,23 @@ export default async function SearchBar(props) {
   const uniqueClasses = [...new Set(studentExamClasses)];
   const displayClass =
     uniqueClasses.length > 0 ? uniqueClasses.join(", ") : student.grade;
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
+        <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl max-w-md">
+          <p className="font-bold text-lg mb-2">Student Notice</p>
+          <p className="text-sm mb-4">{error}</p>
+          <a
+            href="/admin/exams/analysis"
+            className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition"
+          >
+            Back to Exam Analysis
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
