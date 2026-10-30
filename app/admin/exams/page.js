@@ -6,7 +6,7 @@ export default function page() {
   return (
     <>
     <Title title='Exams'/>
-    <div className="flex flex-col md:flex-row gap-6 max-w-3xl mx-auto mt-2 p-5">
+    <div className="flex flex-col md:flex-row gap-6 max-w-5xl mx-auto mt-2 p-5">
         {/* Teacher Card */}
         <div className="flex-1">
           <div className="block bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
@@ -28,6 +28,19 @@ export default function page() {
                 <div className="uppercase text-sm text-indigo-500 font-semibold">/Session</div>
                 <p className='text-lg font-medium mt-2 hover:underline'>Print Marks Cards Yearly</p>
                 <p className='text-gray-600 mt-2'>Get print preview of the marks card and save it as a pdf.</p>
+              
+            </Link>
+          </div>
+        </div>
+
+        {/* Analysis Card */}
+        <div className="flex-1">
+          <div className="block bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+            <Link href='/admin/exams/analysis' className='block p-6'>
+              
+                <div className="uppercase text-sm text-indigo-600 font-bold">/Analysis</div>
+                <p className='text-lg font-medium mt-2 hover:underline text-indigo-950'>Session Intelligence</p>
+                <p className='text-gray-600 mt-2'>Deep analytics, pass/fail trends, merit ranks, and subject mastery.</p>
               
             </Link>
           </div>
