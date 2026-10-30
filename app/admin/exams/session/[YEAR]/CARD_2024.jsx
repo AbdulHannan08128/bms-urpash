@@ -18,7 +18,7 @@ export default async function SearchBar(props) {
   const [pass, setPass] = useState(true);
   const [percentage, setPercentage] = useState(0);
   const [overallGrade, setOverallGrade] = useState("A");
-  const [totalMarks, setTotalMarks] = useState("A");
+  const [totalMarks, setTotalMarks] = useState(0);
   const [rank, setRank] = useState(null);
 
   const admission = searchParams.get("admission");
@@ -88,7 +88,7 @@ export default async function SearchBar(props) {
 
         // Add marks for all specified subjects
         const examTotal = subjects.reduce((subjectTotal, subject) => {
-          const subjectMarks = exam[subject] || 0;
+          const subjectMarks = Number(exam[subject]) || 0;
           console.log(`    ${subject}: ${subjectMarks}`);
           return subjectTotal + subjectMarks;
         }, 0);
@@ -110,14 +110,14 @@ export default async function SearchBar(props) {
     console.log("Given Marks (Total Marks):", total_marks);
 
     // Step 2: Filter marks_array to include only valid numbers
-    const validMarks = marks_array
+    const validMarks = (marks_array || [])
       .map((m) => Number(m)) // Convert to numbers
       .filter((m) => !isNaN(m) && m > 0); // Keep numbers greater than zero
     console.log("Filtered Valid Marks:", validMarks);
 
     if (validMarks.length === 0) {
       console.error("No valid marks found in the array.");
-      return "Invalid marks array.";
+      return "Nil";
     }
 
     // Step 3: Sort the marks in descending order
@@ -125,13 +125,14 @@ export default async function SearchBar(props) {
     console.log("Sorted Marks (Descending Order):", sortedMarks);
 
     // Step 4: Find the rank of the given total_marks
-    const rank = sortedMarks.indexOf(total_marks) + 1;
+    const target = Number(total_marks);
+    const rank = sortedMarks.indexOf(target) + 1;
     console.log(`Rank of Given Marks (${total_marks}):`, rank);
 
     // Step 5: Handle edge case where total_marks is not in the array
     if (rank === 0) {
       console.error(`Marks ${total_marks} not found in the array.`);
-      return `Marks ${total_marks} not found in the array.`;
+      return "Nil";
     }
 
     // Step 6: Append rank suffix
@@ -153,13 +154,37 @@ export default async function SearchBar(props) {
 
   const getOtherStudents = async () => {
     const ALL_EXAMS = marksData;
+    if (!ALL_EXAMS || ALL_EXAMS.length === 0) return;
+
     let class_students = [];
+
+    // Find current student's class from this session's exams first, then fallback to student.grade
+    let currentStudentClass = null;
+    for (const exam of ALL_EXAMS) {
+      if (exam.data && Array.isArray(exam.data) && exam.data[0]) {
+        const found = exam.data[0].find(
+          (s) => String(s.admission) === String(admission)
+        );
+        if (found && found.class) {
+          currentStudentClass = found.class;
+          break;
+        }
+      }
+    }
+    if (!currentStudentClass) {
+      currentStudentClass = student.grade;
+    }
 
     // Collect students of the same grade
     ALL_EXAMS.forEach((exam) => {
       if (exam.data && Array.isArray(exam.data) && exam.data[0]) {
         exam.data[0].forEach((other_student) => {
-          if (student.grade?.toUpperCase() === other_student.class?.toUpperCase()) {
+          if (
+            currentStudentClass &&
+            other_student.class &&
+            currentStudentClass.toString().trim().toUpperCase() ===
+              other_student.class.toString().trim().toUpperCase()
+          ) {
             class_students.push(other_student);
           }
         });
@@ -174,13 +199,14 @@ export default async function SearchBar(props) {
     let uniqueAdmissions = new Set();
 
     class_students.forEach((class_student) => {
-      if (!uniqueAdmissions.has(class_student.admission)) {
+      const admKey = String(class_student.admission);
+      if (!uniqueAdmissions.has(admKey)) {
         // Add admission to the Set
-        uniqueAdmissions.add(class_student.admission);
+        uniqueAdmissions.add(admKey);
 
         // Filter students with the same admission
         let sorted = class_students.filter(
-          (a) => a.admission === class_student.admission
+          (a) => String(a.admission) === admKey
         );
 
         // Push the unique array to sorted_students
@@ -199,11 +225,38 @@ export default async function SearchBar(props) {
     console.clear();
     console.log("MARKS ARRAY: " + marks_array);
 
-    setRank(calculateStudentRank(totalMarks, marks_array[0]));
+    // Get current student's calculated total directly from marks_array[0] to guarantee consistency
+    const currentStudentIdx = sorted_students.findIndex(
+      (studentExams) =>
+        studentExams[0] &&
+        String(studentExams[0].admission) === String(admission)
+    );
+    const marksToRank =
+      currentStudentIdx !== -1 && marks_array[0]
+        ? marks_array[0][currentStudentIdx]
+        : totalMarks;
+
+    setRank(calculateStudentRank(marksToRank, marks_array[0]));
   };
 
   useEffect(() => {
-    switch (student.grade?.toUpperCase()) {
+    let currentStudentClass = null;
+    if (marksData && marksData.length > 0) {
+      for (const exam of marksData) {
+        if (exam.data && Array.isArray(exam.data) && exam.data[0]) {
+          const found = exam.data[0].find(
+            (s) => String(s.admission) === String(admission)
+          );
+          if (found && found.class) {
+            currentStudentClass = found.class;
+            break;
+          }
+        }
+      }
+    }
+    const classToUse = currentStudentClass || student.grade;
+
+    switch (classToUse?.toString().toUpperCase()) {
       case "6TH":
         setGrade(true);
         break;
@@ -227,209 +280,62 @@ export default async function SearchBar(props) {
       default:
         break;
     }
-  }, [student.grade]);
+  }, [student.grade, marksData, admission]);
   if (error) {
     return <div>Error: {error}</div>;
   }
 
-  let calculate_percentage = async () => {
-    setPercentage(
-      (
-        ((grade
-          ? marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .english,
+  const getSubjectMark = (mdata, subject) => {
+    if (!mdata || !mdata.data || !Array.isArray(mdata.data) || !mdata.data[0]) return 0;
+    const st = mdata.data[0].find(
+      (ST) => String(ST.admission) === String(admission)
+    );
+    return st && st[subject] !== undefined ? Number(st[subject]) || 0 : 0;
+  };
 
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .math,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .science,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .urdu,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .kashmiri,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .sst,
-
-              0
-            )
-          : marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .english,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .math,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .science,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .urdu,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .kashmiri,
-
-              0
-            )) /
-          (grade
-            ? marksData.reduce(
-                (total, subject) => total + parseInt(subject.marks),
-                0
-              ) * 6
-            : marksData.reduce(
-                (total, subject) => total + parseInt(subject.marks),
-                0
-              ) * 5)) *
-        100
-      ).toFixed(2)
+  const getSubjectTotal = (subject) => {
+    return marksData.reduce(
+      (total, mdata) => total + getSubjectMark(mdata, subject),
+      0
     );
   };
 
-  const calculate_total_marks = async () => {
-    setTotalMarks(
-      grade
-        ? marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .english,
+  let calculate_percentage = async () => {
+    if (!marksData || marksData.length === 0) return;
+    const subjects = grade
+      ? ["english", "math", "science", "urdu", "kashmiri", "sst"]
+      : ["english", "math", "science", "urdu", "kashmiri"];
 
-            0
-          ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .math,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .science,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .urdu,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .kashmiri,
-
-              0
-            ) +
-            marksData.reduce(
-              (total, mdata) =>
-                total +
-                mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                  .sst,
-
-              0
-            )
-        : marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .english,
-
-            0
-          ) +
-          marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .math,
-
-            0
-          ) +
-          marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .science,
-
-            0
-          ) +
-          marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .urdu,
-
-            0
-          ) +
-          marksData.reduce(
-            (total, mdata) =>
-              total +
-              mdata.data[0].find((ST) => ST.admission == parseInt(admission))
-                .kashmiri,
-
-            0
-          )
+    const totalObtained = subjects.reduce(
+      (sum, subject) => sum + getSubjectTotal(subject),
+      0
     );
+
+    const maxMarksPerExam = marksData.reduce(
+      (total, subject) => total + (parseInt(subject.marks) || 0),
+      0
+    );
+    const totalMax = maxMarksPerExam * (grade ? 6 : 5);
+
+    if (totalMax === 0) {
+      setPercentage(0);
+      return;
+    }
+
+    setPercentage(((totalObtained / totalMax) * 100).toFixed(2));
+  };
+
+  const calculate_total_marks = async () => {
+    if (!marksData || marksData.length === 0) return;
+    const subjects = grade
+      ? ["english", "math", "science", "urdu", "kashmiri", "sst"]
+      : ["english", "math", "science", "urdu", "kashmiri"];
+
+    const totalObtained = subjects.reduce(
+      (sum, subject) => sum + getSubjectTotal(subject),
+      0
+    );
+    setTotalMarks(totalObtained);
   };
 
   useEffect(() => {
@@ -454,7 +360,23 @@ export default async function SearchBar(props) {
         ? "D" // Below Average
         : "F" // Fail
     );
-  }, [marksData, grade, isNotEVS, overallGrade, percentage, pass, totalMarks]);
+  }, [marksData, student, grade, isNotEVS, overallGrade, percentage, pass, totalMarks]);
+
+  const studentExamClasses = marksData
+    .map((exam) => {
+      if (exam.data && Array.isArray(exam.data) && exam.data[0]) {
+        const found = exam.data[0].find(
+          (s) => String(s.admission) === String(admission)
+        );
+        return found && found.class ? found.class : null;
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  const uniqueClasses = [...new Set(studentExamClasses)];
+  const displayClass =
+    uniqueClasses.length > 0 ? uniqueClasses.join(", ") : student.grade;
 
   return (
     <>
@@ -544,7 +466,7 @@ export default async function SearchBar(props) {
                     </div>
                     <div className="font-bold uppercase">
                       <span className="opacity-80"> Class: </span>
-                      <span className="text-black-700">{student.grade}</span>
+                      <span className="text-black-700">{displayClass}</span>
                     </div>
                     <div className="font-bold uppercase">
                       <span className="opacity-80"> Registration No.: </span>
@@ -636,11 +558,7 @@ export default async function SearchBar(props) {
                         return (
                           <>
                             <th className={`th text-center`}>
-                              {
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).english
-                              }
+                              {getSubjectMark(mdata, "english")}
                             </th>
                             <th className={`th text-center`}>{mdata.marks}</th>
                           </>
@@ -648,19 +566,12 @@ export default async function SearchBar(props) {
                       })}
                       <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
-                        {marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).english,
-                          0
-                        )}
+                        {getSubjectTotal("english")}
                       </th>
                       <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
-                          (total, subject) => total + parseInt(subject.marks),
+                          (total, subject) => total + (parseInt(subject.marks) || 0),
                           0
                         )}
                       </th>
@@ -686,11 +597,7 @@ export default async function SearchBar(props) {
                         return (
                           <>
                             <th className={`th text-center`}>
-                              {
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).math
-                              }
+                              {getSubjectMark(mdata, "math")}
                             </th>
                             <th className={`th text-center`}>{mdata.marks}</th>
                           </>
@@ -698,20 +605,12 @@ export default async function SearchBar(props) {
                       })}
                       <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
-                        {marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).math,
-
-                          0
-                        )}
+                        {getSubjectTotal("math")}
                       </th>
                       <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
-                          (total, subject) => total + parseInt(subject.marks),
+                          (total, subject) => total + (parseInt(subject.marks) || 0),
                           0
                         )}
                       </th>
@@ -738,11 +637,7 @@ export default async function SearchBar(props) {
                         return (
                           <>
                             <th className={`th text-center`}>
-                              {
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).science
-                              }
+                              {getSubjectMark(mdata, "science")}
                             </th>
                             <th className={`th text-center`}>{mdata.marks}</th>
                           </>
@@ -750,20 +645,12 @@ export default async function SearchBar(props) {
                       })}
                       <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
-                        {marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).science,
-
-                          0
-                        )}
+                        {getSubjectTotal("science")}
                       </th>
                       <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
-                          (total, subject) => total + parseInt(subject.marks),
+                          (total, subject) => total + (parseInt(subject.marks) || 0),
                           0
                         )}
                       </th>
@@ -789,11 +676,7 @@ export default async function SearchBar(props) {
                         return (
                           <>
                             <th className={`th text-center`}>
-                              {
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).urdu
-                              }
+                              {getSubjectMark(mdata, "urdu")}
                             </th>
                             <th className={`th text-center`}>{mdata.marks}</th>
                           </>
@@ -801,20 +684,12 @@ export default async function SearchBar(props) {
                       })}
                       <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
-                        {marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).urdu,
-
-                          0
-                        )}
+                        {getSubjectTotal("urdu")}
                       </th>
                       <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
-                          (total, subject) => total + parseInt(subject.marks),
+                          (total, subject) => total + (parseInt(subject.marks) || 0),
                           0
                         )}
                       </th>
@@ -839,11 +714,7 @@ export default async function SearchBar(props) {
                         return (
                           <>
                             <th className={`th text-center`}>
-                              {
-                                mdata.data[0].find(
-                                  (ST) => ST.admission == parseInt(admission)
-                                ).kashmiri
-                              }
+                              {getSubjectMark(mdata, "kashmiri")}
                             </th>
                             <th className={`th text-center`}>{mdata.marks}</th>
                           </>
@@ -851,20 +722,12 @@ export default async function SearchBar(props) {
                       })}
                       <th className={`th text-center`}>
                         {/* Displaying the total obtained marks here */}
-                        {marksData.reduce(
-                          (total, mdata) =>
-                            total +
-                            mdata.data[0].find(
-                              (ST) => ST.admission == parseInt(admission)
-                            ).kashmiri,
-
-                          0
-                        )}
+                        {getSubjectTotal("kashmiri")}
                       </th>
                       <th className={`th text-center`}>
                         {/* Displaying the total maximum marks here */}
                         {marksData.reduce(
-                          (total, subject) => total + parseInt(subject.marks),
+                          (total, subject) => total + (parseInt(subject.marks) || 0),
                           0
                         )}
                       </th>
@@ -891,11 +754,7 @@ export default async function SearchBar(props) {
                           return (
                             <>
                               <th className={`th text-center`}>
-                                {
-                                  mdata.data[0].find(
-                                    (ST) => ST.admission == parseInt(admission)
-                                  ).sst
-                                }
+                                {getSubjectMark(mdata, "sst")}
                               </th>
                               <th className={`th text-center`}>
                                 {mdata.marks}
@@ -905,20 +764,12 @@ export default async function SearchBar(props) {
                         })}
                         <th className={`th text-center`}>
                           {/* Displaying the total obtained marks here */}
-                          {marksData.reduce(
-                            (total, mdata) =>
-                              total +
-                              mdata.data[0].find(
-                                (ST) => ST.admission == parseInt(admission)
-                              ).sst,
-
-                            0
-                          )}
+                          {getSubjectTotal("sst")}
                         </th>
                         <th className={`th text-center`}>
                           {/* Displaying the total maximum marks here */}
                           {marksData.reduce(
-                            (total, subject) => total + parseInt(subject.marks),
+                            (total, subject) => total + (parseInt(subject.marks) || 0),
                             0
                           )}
                         </th>
@@ -942,6 +793,13 @@ export default async function SearchBar(props) {
                         style={{ borderLeft: "none" }}
                       ></th>
                       {marksData.map((mdata) => {
+                        const subs = grade
+                          ? ["english", "math", "science", "urdu", "kashmiri", "sst"]
+                          : ["english", "math", "science", "urdu", "kashmiri"];
+                        const examTotal = subs.reduce(
+                          (sum, sub) => sum + getSubjectMark(mdata, sub),
+                          0
+                        );
                         return (
                           <>
                             <th
@@ -951,55 +809,7 @@ export default async function SearchBar(props) {
                                   : "th text-center text-red-800"
                               }
                             >
-                              {grade
-                                ? eval(
-                                    mdata.data[0].find(
-                                      (ST) =>
-                                        ST.admission == parseInt(admission)
-                                    ).english +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).math +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).science +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).urdu +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).kashmiri +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).sst
-                                  )
-                                : eval(
-                                    mdata.data[0].find(
-                                      (ST) =>
-                                        ST.admission == parseInt(admission)
-                                    ).english +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).math +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).science +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).urdu +
-                                      mdata.data[0].find(
-                                        (ST) =>
-                                          ST.admission == parseInt(admission)
-                                      ).kashmiri
-                                  )}
+                              {examTotal}
                             </th>
                             <th className={`th text-center `}>
                               {grade
