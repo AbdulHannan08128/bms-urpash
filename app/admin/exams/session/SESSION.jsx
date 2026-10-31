@@ -43,9 +43,10 @@ export default function SESSION(props) {
         exam.data[0] ? exam.data[0] : []
       );
 
-      // Filter unique students based on admission number
+      // Filter unique students based on admission number and class
       const uniqueStudents = allStudents.reduce((acc, student) => {
-        if (!acc.find((s) => s.admission === student.admission)) {
+        const key = `${student.admission}_${student.class}`;
+        if (!acc.find((s) => `${s.admission}_${s.class}` === key)) {
           acc.push(student);
         }
         return acc;
@@ -90,7 +91,7 @@ export default function SESSION(props) {
                   <td className="px-6 py-4 whitespace-nowrap flex gap-10">
                  
                   <Link
-                    href={`/admin/exams/session/${selectedYear}?admission=${student.admission}`}
+                    href={`/admin/exams/session/${selectedYear}?admission=${student.admission}&class=${encodeURIComponent(student.class)}`}
                   >
                     <button className="text-indigo-600 hover:text-indigo-900">
                       Print Card
