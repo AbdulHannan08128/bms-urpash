@@ -22,16 +22,32 @@ export default function SearchBar(props) {
   const [rank, setRank] = useState(null);
 
   const admission = searchParams.get("admission");
+  const classParam = searchParams.get("class");
 
   useEffect(() => {
     const fetchStudent = async () => {
       try {
+        const query = classParam
+          ? `admission=${admission}&grade=${encodeURIComponent(classParam)}`
+          : `admission=${admission}`;
         const studentResponse = await axios.get(
-          `${props.URL_1}?admission=${admission}`
+          `${props.URL_1}?${query}&_t=${Date.now()}`
         );
-        setStudent(studentResponse.data[0]);
-        console.log("studentResponse.data[0]");
-        console.log(studentResponse.data[0]);
+        let found = null;
+        if (Array.isArray(studentResponse.data)) {
+          if (classParam) {
+            found = studentResponse.data.find(
+              (s) => String(s.grade).trim().toLowerCase() === String(classParam).trim().toLowerCase()
+            );
+          }
+          if (!found) {
+            found = studentResponse.data[0];
+          }
+        } else {
+          found = studentResponse.data;
+        }
+        setStudent(found || {});
+        console.log("studentResponse data:", found);
       } catch (error) {
         setError(
           error.message || "An error occurred while fetching student data"
@@ -158,21 +174,20 @@ export default function SearchBar(props) {
 
     let class_students = [];
 
-    // Find current student's class from this session's exams first, then fallback to student.grade
-    let currentStudentClass = null;
-    for (const exam of ALL_EXAMS) {
-      if (exam.data && Array.isArray(exam.data) && exam.data[0]) {
-        const found = exam.data[0].find(
-          (s) => String(s.admission) === String(admission)
-        );
-        if (found && found.class) {
-          currentStudentClass = found.class;
-          break;
+    // Find current student's class: prefer classParam or student.grade, fallback to exams
+    let currentStudentClass = classParam || (student ? student.grade : null);
+    if (!currentStudentClass) {
+      for (const exam of ALL_EXAMS) {
+        if (exam.data && Array.isArray(exam.data) && exam.data[0]) {
+          const found = exam.data[0].find(
+            (s) => String(s.admission) === String(admission)
+          );
+          if (found && found.class) {
+            currentStudentClass = found.class;
+            break;
+          }
         }
       }
-    }
-    if (!currentStudentClass) {
-      currentStudentClass = student.grade;
     }
 
     // Collect students of the same grade
@@ -284,9 +299,15 @@ export default function SearchBar(props) {
 
   const getSubjectMark = (mdata, subject) => {
     if (!mdata || !mdata.data || !Array.isArray(mdata.data) || !mdata.data[0]) return 0;
-    const st = mdata.data[0].find(
-      (ST) => String(ST.admission) === String(admission)
-    );
+    const targetClass = classParam || (student ? student.grade : null);
+    const st = mdata.data[0].find((ST) => {
+      const matchAdm = String(ST.admission) === String(admission);
+      if (!matchAdm) return false;
+      if (targetClass && ST.class) {
+        return String(ST.class).trim().toLowerCase() === String(targetClass).trim().toLowerCase();
+      }
+      return true;
+    });
     return st && st[subject] !== undefined ? Number(st[subject]) || 0 : 0;
   };
 

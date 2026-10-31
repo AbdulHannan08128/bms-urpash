@@ -7,14 +7,19 @@ export const fetchCache = "auto";
 export const runtime = "nodejs";
 export const preferredRegion = "auto";
 export const maxDuration = 5;
-function CustomSelect({ options, onSelect }) {
-    const [selectedOption, setSelectedOption] = useState('');
-   
+function CustomSelect({ options, onSelect, value }) {
+    const [selectedOption, setSelectedOption] = useState(value || '');
+
+    React.useEffect(() => {
+        if (value !== undefined) {
+            setSelectedOption(value || '');
+        }
+    }, [value]);
 
     const handleSelectChange = (e) => {
-        const value = e.target.value;
-        setSelectedOption(value);
-        onSelect(value);
+        const val = e.target.value;
+        setSelectedOption(val);
+        onSelect(val);
     };
 
     return (
@@ -69,8 +74,7 @@ function MyComponent(props) {
 
     return (
         <div className="container mx-auto p-4">
-            
-            <CustomSelect options={options} onSelect={handleSelect} />
+            <CustomSelect options={options} onSelect={handleSelect} value={props.value} />
         </div>
     );
 }

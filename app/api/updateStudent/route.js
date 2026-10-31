@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/utils/db';
 import Student from '@/models/students';
-import { updateAdmissionInExams } from '../../../dbfunctions/updateStudent';
+import { updateStudentInExams } from '../../../dbfunctions/updateStudent';
 
 export async function GET(req) {
   return NextResponse.json({ status: 200 });
@@ -12,31 +12,56 @@ export async function POST(req) {
     await connectDB();
     const data = await req.formData();
 
+    const studentId = (data.get('studentId') || data.get('id') || '').toString().trim();
     const rawOldAdmission = data.get('oldAdmission');
     const rawNewAdmission = data.get('admission');
+    const studentGrade = (data.get('grade') || '').toString().trim();
 
     // Use oldAdmission if provided, else fallback to new admission
     const oldAdmission = (rawOldAdmission || rawNewAdmission || '').toString().trim();
     const newAdmission = (rawNewAdmission || rawOldAdmission || '').toString().trim();
 
-    if (!oldAdmission) {
+    if (!studentId && !oldAdmission) {
       return NextResponse.json(
-        { status: 400, error: 'Admission number is required' },
+        { status: 400, error: 'Student ID or Admission number is required' },
         { status: 400 }
       );
     }
 
-    // Search query for the existing student
-    const searchCondition = {
-      $or: [
-        { admission: oldAdmission },
-        ...(!isNaN(Number(oldAdmission)) ? [{ admission: Number(oldAdmission) }] : [])
-      ]
-    };
+    let existingStudent = null;
 
-    let existingStudent = await Student.findOne(searchCondition);
+    // 1. Try finding by unique _id first (most reliable, prevents any duplicate admission collisions)
+    if (studentId) {
+      try {
+        existingStudent = await Student.findById(studentId);
+      } catch (err) {
+        // If studentId was not a valid ObjectId, proceed to fallback lookups
+      }
+    }
 
-    // If not found by old admission, fallback search by new admission
+    // 2. Disambiguate by admission + grade if both available
+    if (!existingStudent && oldAdmission && studentGrade) {
+      existingStudent = await Student.findOne({
+        grade: studentGrade,
+        $or: [
+          { admission: oldAdmission },
+          ...(!isNaN(Number(oldAdmission)) ? [{ admission: Number(oldAdmission) }] : [])
+        ]
+      });
+    }
+
+    // 3. Search query for the existing student by old admission
+    if (!existingStudent && oldAdmission) {
+      const searchCondition = {
+        $or: [
+          { admission: oldAdmission },
+          ...(!isNaN(Number(oldAdmission)) ? [{ admission: Number(oldAdmission) }] : [])
+        ]
+      };
+      existingStudent = await Student.findOne(searchCondition);
+    }
+
+    // 4. Fallback search by new admission
     if (!existingStudent && newAdmission && newAdmission !== oldAdmission) {
       existingStudent = await Student.findOne({
         $or: [
@@ -96,11 +121,16 @@ export async function POST(req) {
       { new: true }
     );
 
-    // If admission number was changed, propagate update across all exam records
-    let examUpdates = { updatedExamsCount: 0, updatedRecordsCount: 0 };
-    if (newAdmission && oldAdmission !== newAdmission) {
-      examUpdates = await updateAdmissionInExams(oldAdmission, newAdmission);
-    }
+    // Propagate student updates across all exam records, scoped to student's class
+    const examUpdates = await updateStudentInExams(
+      oldAdmission,
+      {
+        admission: newAdmission,
+        name: newStudentData.name,
+        father: newStudentData.father
+      },
+      existingStudent.grade || studentGrade
+    );
 
     return NextResponse.json({
       status: 200,

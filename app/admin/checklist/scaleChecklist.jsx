@@ -214,7 +214,7 @@ export default function Checklist(props) {
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-4">
                           <Link
-                            href={"/admin/checklist/edit/" + item.admission}
+                            href={`/admin/checklist/edit/${item.admission}?id=${item._id}${item.grade ? `&grade=${encodeURIComponent(item.grade)}` : ""}`}
                           >
                             <button className="print-button md:inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded PHIDE">
                               EDIT

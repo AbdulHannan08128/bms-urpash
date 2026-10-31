@@ -12,11 +12,13 @@ export const fetchCache = "auto";
 export const runtime = "nodejs";
 export const preferredRegion = "auto";
 export const maxDuration = 5;
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Checklist(props) {
   const router = useRouter();
-  const [grade, setGrade] = useState(false);
+  const searchParams = useSearchParams();
+  const queryGrade = searchParams?.get("grade");
+  const [grade, setGrade] = useState(queryGrade || false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [Delete, setDelete] = useState(false);
@@ -25,34 +27,30 @@ export default function Checklist(props) {
   async function getData(grade) {
     setLoading(true);
   
+    const url = props.URL || '/api/addStudents';
     get(
-      `${props.URL}?grade=${grade}`,
+      `${url}?grade=${grade}&_t=${Date.now()}`,
       (response) => {
         setData(response.data);
-        // alert('Success');
         console.log(response.data);
-        console.log(data);
         setLoading(false);
       },
       () => {
-        // alert('An Error Occurred');
         setLoading(false);
       }
     );
   }
   async function getAllData() {
     setLoading(true);
+    const url = props.URL || '/api/addStudents';
     get(
-      `${props.URL}`,
+      `${url}?_t=${Date.now()}`,
       (response) => {
         setData(response.data);
-        // alert('Success');
         console.log(response.data);
-        console.log(data);
         setLoading(false);
       },
       () => {
-        // alert('An Error Occurred');
         setLoading(false);
       }
     );
@@ -109,10 +107,32 @@ export default function Checklist(props) {
     }
   }, [grade]);
 
+  // Synchronize when queryGrade in URL changes
+  useEffect(() => {
+    if (queryGrade && queryGrade !== grade) {
+      setGrade(queryGrade);
+    }
+  }, [queryGrade]);
+
+  // BFCache (back-forward cache) listener: refetch fresh data on back button
+  useEffect(() => {
+    const handlePageShow = (e) => {
+      if (e.persisted) {
+        if (grade === "all") {
+          getAllData();
+        } else if (grade) {
+          getData(grade);
+        }
+      }
+    };
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, [grade]);
+
   return (
     <>
       <div className="w-auto h-auto p-0 mt-6 flex align-middle justify-center flex-col gap-0">
-        <Select Function={setGrade} />
+        <Select Function={setGrade} value={grade || ""} />
 
         <div className="overflow-scroll rounded-lg border border-gray-200 shadow-md m-5">
           <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
@@ -219,7 +239,7 @@ export default function Checklist(props) {
                       <td className="px-6 py-4">
                         <div className="flex justify-end gap-4">
                           <Link
-                            href={"/admin/checklist/edit/" + item.admission}
+                            href={`/admin/checklist/edit/${item.admission}?id=${item._id}${grade ? `&grade=${encodeURIComponent(grade)}` : (item.grade ? `&grade=${encodeURIComponent(item.grade)}` : "")}`}
                           >
                             <button className="print-button md:inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded PHIDE">
                               EDIT

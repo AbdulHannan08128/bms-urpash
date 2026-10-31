@@ -2,11 +2,12 @@ import Student from '../models/students.js';
 import Exam from '../models/exams.js';
 
 /**
- * Propagate admission number change to all exam records in MongoDB.
+ * Propagate student changes (admission, name, father) to all exam records in MongoDB.
  * In legacy exam records, exam.data[0] contains an array of student marks objects.
+ * Accepts optional studentClass to disambiguate students sharing the same admission number across different grades.
  */
-export const updateAdmissionInExams = async (oldAdmission, newAdmission) => {
-  if (!oldAdmission || !newAdmission || String(oldAdmission).trim() === String(newAdmission).trim()) {
+export const updateStudentInExams = async (oldAdmission, updatedFields = {}, studentClass = null) => {
+  if (!oldAdmission) {
     return { updatedExamsCount: 0, updatedRecordsCount: 0 };
   }
 
@@ -14,6 +15,11 @@ export const updateAdmissionInExams = async (oldAdmission, newAdmission) => {
   const exams = await Exam.find({});
   let updatedExamsCount = 0;
   let updatedRecordsCount = 0;
+
+  const newAdmission = updatedFields.admission ? String(updatedFields.admission).trim() : null;
+  const newName = updatedFields.name !== undefined && updatedFields.name !== null ? String(updatedFields.name).trim() : null;
+  const newFather = updatedFields.father !== undefined && updatedFields.father !== null ? String(updatedFields.father).trim() : null;
+  const targetClass = studentClass ? String(studentClass).trim().toUpperCase() : null;
 
   for (const exam of exams) {
     let examModified = false;
@@ -24,18 +30,45 @@ export const updateAdmissionInExams = async (oldAdmission, newAdmission) => {
           for (let j = 0; j < item.length; j++) {
             const record = item[j];
             if (record && record.admission !== undefined && String(record.admission).trim() === oldAdmStr) {
-              record.admission = (typeof record.admission === 'number' && !isNaN(Number(newAdmission)))
-                ? Number(newAdmission)
-                : String(newAdmission).trim();
+              // Disambiguate if targetClass is provided and record has a different class
+              const recClass = record.class ? String(record.class).trim().toUpperCase() : null;
+              if (targetClass && recClass && recClass !== targetClass) {
+                continue;
+              }
+
+              if (newAdmission) {
+                record.admission = (typeof record.admission === 'number' && !isNaN(Number(newAdmission)))
+                  ? Number(newAdmission)
+                  : newAdmission;
+              }
+              if (newName) {
+                record.name = newName;
+              }
+              if (newFather) {
+                record.father = newFather;
+              }
               examModified = true;
               updatedRecordsCount++;
             }
           }
         } else if (item && typeof item === 'object') {
           if (item.admission !== undefined && String(item.admission).trim() === oldAdmStr) {
-            item.admission = (typeof item.admission === 'number' && !isNaN(Number(newAdmission)))
-              ? Number(newAdmission)
-              : String(newAdmission).trim();
+            const recClass = item.class ? String(item.class).trim().toUpperCase() : null;
+            if (targetClass && recClass && recClass !== targetClass) {
+              continue;
+            }
+
+            if (newAdmission) {
+              item.admission = (typeof item.admission === 'number' && !isNaN(Number(newAdmission)))
+                ? Number(newAdmission)
+                : newAdmission;
+            }
+            if (newName) {
+              item.name = newName;
+            }
+            if (newFather) {
+              item.father = newFather;
+            }
             examModified = true;
             updatedRecordsCount++;
           }
@@ -50,8 +83,13 @@ export const updateAdmissionInExams = async (oldAdmission, newAdmission) => {
     }
   }
 
-  console.log(`Updated admission in ${updatedExamsCount} exams (${updatedRecordsCount} student records) from ${oldAdmission} to ${newAdmission}`);
+  console.log(`Updated exams for student (${oldAdmission}): ${updatedExamsCount} exams, ${updatedRecordsCount} records`);
   return { updatedExamsCount, updatedRecordsCount };
+};
+
+// Alias for backwards compatibility
+export const updateAdmissionInExams = (oldAdmission, newAdmission, studentClass = null) => {
+  return updateStudentInExams(oldAdmission, { admission: newAdmission }, studentClass);
 };
 
 const updateStudent = async (admissionNumber, newData) => {
@@ -74,11 +112,12 @@ const updateStudent = async (admissionNumber, newData) => {
       throw new Error(`Student not found with admission: ${admissionNumber}`);
     }
 
-    // Check if admission number changed and cascade to exams
-    const newAdm = newData.admission ? String(newData.admission).trim() : oldAdm;
-    if (newAdm && oldAdm !== newAdm) {
-      await updateAdmissionInExams(oldAdm, newAdm);
-    }
+    // Cascade student details to exams immediately
+    await updateStudentInExams(oldAdm, {
+      admission: newData.admission,
+      name: newData.name,
+      father: newData.father
+    }, updatedStudent.grade);
     
     console.log('Student updated successfully:', updatedStudent.admission);
     return updatedStudent;

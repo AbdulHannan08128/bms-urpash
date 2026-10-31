@@ -25,6 +25,7 @@ const MyForm = (props) => {
     selectOption: "",
   });
 
+  const [currentAdmission, setCurrentAdmission] = useState(props.admission || "");
   const [photo, setPhoto] = useState(null);
   const [change, setChange] = useState(false);
 
@@ -32,10 +33,22 @@ const MyForm = (props) => {
     const fetchData = async () => {
       try {
         const fetchUrl = props.URL || "/api/addStudents";
-        const res = await axios.get(`${fetchUrl}?admission=${props.admission}`);
+        let query = "";
+        if (props.id) {
+          query = `id=${encodeURIComponent(props.id)}`;
+        } else if (props.admission && props.grade) {
+          query = `admission=${encodeURIComponent(props.admission)}&grade=${encodeURIComponent(props.grade)}`;
+        } else {
+          query = `admission=${encodeURIComponent(props.admission)}`;
+        }
+
+        const res = await axios.get(`${fetchUrl}?${query}&_t=${Date.now()}`);
         const fetchedData = Array.isArray(res.data) ? res.data[0] : res.data;
         if (fetchedData) {
           setData(fetchedData);
+          if (fetchedData.admission) {
+            setCurrentAdmission(String(fetchedData.admission));
+          }
         } else {
           alert("ERROR: No student data found for admission: " + props.admission);
         }
@@ -45,10 +58,10 @@ const MyForm = (props) => {
       }
     };
 
-    if (props.admission) {
+    if (props.id || props.admission) {
       fetchData();
     }
-  }, [props.URL, props.admission]);
+  }, [props.URL, props.id, props.admission, props.grade]);
 
   // Update formData when data changes
   useEffect(() => {
@@ -141,8 +154,10 @@ const MyForm = (props) => {
     try {
       setSubmitting(true);
       const formDATA = new FormData();
+      // Crucial: send studentId so backend can pinpoint exact document by _id
+      formDATA.append("studentId", props.id || data._id || "");
       // Crucial: send oldAdmission so backend can find and update student & cascade to exams
-      formDATA.append("oldAdmission", props.admission || "");
+      formDATA.append("oldAdmission", currentAdmission || props.admission || "");
       formDATA.append("roll", formData.roll || "");
       formDATA.append("admission", formData.admission || "");
       formDATA.append("aadhar", formData.aadhar || "");
@@ -166,6 +181,9 @@ const MyForm = (props) => {
       const res = await axios.post(postUrl, formDATA);
 
       if (res.status === 200 || res.data?.status === 200) {
+        if (formData.admission) {
+          setCurrentAdmission(String(formData.admission));
+        }
         setSuccess(true);
       } else {
         alert("Failed to submit form: " + (res.data?.error || "Unknown error"));
@@ -446,7 +464,12 @@ const MyForm = (props) => {
         </form>
       </div>
 
-      {success && <Alert Function={setSuccess} />}
+      {success && (
+        <Alert
+          Function={setSuccess}
+          grade={formData.grade || data.grade || props.grade}
+        />
+      )}
     </>
   );
 };

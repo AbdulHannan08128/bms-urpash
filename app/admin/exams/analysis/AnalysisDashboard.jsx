@@ -23,7 +23,8 @@ export default function AnalysisDashboard({ initialUrl }) {
     const fetchExams = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(initialUrl || "/api/exams/BULK");
+        const baseUrl = initialUrl || "/api/exams/BULK";
+        const res = await axios.get(`${baseUrl}${baseUrl.includes("?") ? "&" : "?"}_t=${Date.now()}`);
         if (res.data && Array.isArray(res.data)) {
           setAllExams(res.data);
           // Set default selected year to latest available
@@ -56,6 +57,7 @@ export default function AnalysisDashboard({ initialUrl }) {
 
   // Helper to generate a collision-free unique key for each student
   const getStudentKey = (st) => {
+    const cleanClass = (st.class || "").trim().toLowerCase();
     const hasValidAdm =
       st.admission !== undefined &&
       st.admission !== null &&
@@ -64,10 +66,9 @@ export default function AnalysisDashboard({ initialUrl }) {
       String(st.admission).toLowerCase() !== "null";
 
     if (hasValidAdm) {
-      return `adm_${String(st.admission).trim()}`;
+      return `adm_${String(st.admission).trim()}_cls_${cleanClass}`;
     }
     const cleanName = (st.name || "").trim().toLowerCase();
-    const cleanClass = (st.class || "").trim().toLowerCase();
     const cleanFather = (st.father || "").trim().toLowerCase();
     return `name_${cleanName}_${cleanClass}_${cleanFather}`;
   };
@@ -1104,7 +1105,7 @@ export default function AnalysisDashboard({ initialUrl }) {
                   <Link
                     href={`/admin/exams/session/${selectedYear}?admission=${
                       st.admission !== "N/A" ? st.admission : encodeURIComponent(st.name)
-                    }`}
+                    }&class=${encodeURIComponent(st.class)}`}
                     className="btn-action"
                   >
                     Print Card
@@ -1185,7 +1186,7 @@ export default function AnalysisDashboard({ initialUrl }) {
                       <Link
                         href={`/admin/exams/session/${selectedYear}?admission=${
                           st.admission !== "N/A" ? st.admission : encodeURIComponent(st.name)
-                        }`}
+                        }&class=${encodeURIComponent(st.class)}`}
                         className="text-indigo-600 hover:text-indigo-900 text-xs font-bold underline"
                       >
                         Print Card

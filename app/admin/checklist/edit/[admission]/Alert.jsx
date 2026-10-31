@@ -41,8 +41,10 @@ function MyComponent(props) {
     const handleClose = () => {
         setShowSuccessAlert(false);
         props.Function(false);
-        Router.push('/admin/checklist');
-
+        const targetUrl = props.grade
+          ? `/admin/checklist?grade=${encodeURIComponent(props.grade)}`
+          : '/admin/checklist';
+        window.location.href = targetUrl;
     };
 
     return (
