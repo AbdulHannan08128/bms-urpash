@@ -23,6 +23,17 @@ export default function SESSION(props) {
   }, [props.URL]);
 
   useEffect(() => {
+    if (data.length > 0 && !selectedYear) {
+      const years = Array.from(new Set(data.map((option) => option.year).filter(Boolean)));
+      if (years.includes("2026")) {
+        setSelectedYear("2026");
+      } else if (years.length > 0) {
+        setSelectedYear(years[0]);
+      }
+    }
+  }, [data, selectedYear]);
+
+  useEffect(() => {
     if (selectedYear) {
       // Filter exams for the selected academic year
       const filteredExams = data.filter((exam) => exam.year === selectedYear);
@@ -48,7 +59,7 @@ export default function SESSION(props) {
 
   return (
     <div className="mt-4 ml-5">
-      <DROPDOWN options={data} func={setSelectedYear} />
+      <DROPDOWN options={data} func={setSelectedYear} value={selectedYear} />
       {students?students.length > 0 ? (
         <div className="overflow-x-auto p-5">
           <table className="min-w-full divide-y divide-gray-200">

@@ -1,12 +1,12 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { get } from "../../../../../functions/axios.get";
-import { post } from "../../../../../functions/axios.post";
+import axios from "axios";
 import Alert from "./Alert";
 
 const MyForm = (props) => {
   const [data, setData] = useState({});
-  const [success, setSuccess] = useState();
+  const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     roll: "",
     admission: "",
@@ -31,57 +31,60 @@ const MyForm = (props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await get(`${props.URL}?admission=${props.admission}`, (response) => {
-          const fetchedData = response.data[0];
-          if (fetchedData) {
-            setData(fetchedData);
-          } else {
-            alert("ERROR: No data received");
-          }
-        });
+        const fetchUrl = props.URL || "/api/addStudents";
+        const res = await axios.get(`${fetchUrl}?admission=${props.admission}`);
+        const fetchedData = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (fetchedData) {
+          setData(fetchedData);
+        } else {
+          alert("ERROR: No student data found for admission: " + props.admission);
+        }
       } catch (error) {
-        console.error("Error fetching data:", error);
-        alert("ERROR: Failed to fetch data");
+        console.error("Error fetching student data:", error);
+        alert("ERROR: Failed to fetch student data");
       }
     };
 
-    fetchData();
+    if (props.admission) {
+      fetchData();
+    }
   }, [props.URL, props.admission]);
 
   // Update formData when data changes
   useEffect(() => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      roll: data.roll,
-      name: data.name,
-      dob: data.dob,
-      admission: data.admission,
-      aadhar: data.aadhar,
-      father: data.father || data.parentage,
-      mother: data.mother,
-      grade: data.grade,
-      phone: data.phone,
-      email: data.email,
-      address: data.address,
-      account: data.account,
-      photo: data.photo || null,
-      selectOption: data.category,
-    }));
-  }, [data]);
-
-  // Log the updated state
-  useEffect(() => {
-    console.log("Updated data:", data);
+    if (data && Object.keys(data).length > 0) {
+      setFormData({
+        roll: data.roll || "",
+        name: data.name || "",
+        dob: data.dob || "",
+        admission:
+          data.admission !== undefined && data.admission !== null
+            ? String(data.admission)
+            : "",
+        aadhar: data.aadhar || "",
+        father: data.father || data.parentage || "",
+        mother: data.mother || "",
+        grade: data.grade || "",
+        phone: data.phone || "",
+        email: data.email || "",
+        address: data.address || "",
+        account: data.account || "",
+        photo: data.photo || null,
+        selectOption: data.category || "",
+      });
+    }
   }, [data]);
 
   const handleChange = (e) => {
     if (e.target.name === "photo") {
-      setChange(true);
-      setFormData({
-        ...formData,
-        photo: URL.createObjectURL(e.target.files[0]),
-      });
-      setPhoto(e.target.files[0]);
+      if (e.target.files && e.target.files[0]) {
+        setChange(true);
+        setFormData({
+          ...formData,
+          photo: URL.createObjectURL(e.target.files[0]),
+        });
+        setPhoto(e.target.files[0]);
+      }
     } else {
       const { name, value } = e.target;
       setFormData({
@@ -91,33 +94,90 @@ const MyForm = (props) => {
     }
   };
 
+  const renderExistingPhoto = () => {
+    if (!formData.photo) return null;
+
+    if (typeof formData.photo === "string") {
+      const src =
+        formData.photo.startsWith("data:") ||
+        formData.photo.startsWith("blob:") ||
+        formData.photo.startsWith("http")
+          ? formData.photo
+          : `data:image/png;base64,${formData.photo}`;
+      return (
+        <img
+          src={src}
+          alt="Student"
+          className="w-96 h-96 object-cover rounded-full"
+        />
+      );
+    }
+
+    if (formData.photo && formData.photo.data && Array.isArray(formData.photo.data)) {
+      try {
+        const str = formData.photo.data
+          .map((b) => String.fromCharCode(b))
+          .join("");
+        const src = str.startsWith("data:image")
+          ? str
+          : `data:image/png;base64,${str}`;
+        return (
+          <img
+            src={src}
+            alt="Student"
+            className="w-96 h-96 object-cover rounded-full"
+          />
+        );
+      } catch (err) {
+        console.error("Error decoding photo buffer:", err);
+      }
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setSubmitting(true);
       const formDATA = new FormData();
-      // Append form data
-      formDATA.append("roll", formData.roll);
-      formDATA.append("admission", formData.admission);
-      formDATA.append("aadhar", formData.aadhar);
-      formDATA.append("name", formData.name);
-      formDATA.append("father", formData.father);
-      formDATA.append("mother", formData.mother);
-      formDATA.append("category", formData.selectOption);
-      formDATA.append("grade", formData.grade);
-      formDATA.append("dob", formData.dob);
-      formDATA.append("phone", formData.phone);
-      formDATA.append("email", formData.email);
-      formDATA.append("address", formData.address);
-      formDATA.append("account", formData.account);
-      formDATA.append("photo", photo); // Append the file object
+      // Crucial: send oldAdmission so backend can find and update student & cascade to exams
+      formDATA.append("oldAdmission", props.admission || "");
+      formDATA.append("roll", formData.roll || "");
+      formDATA.append("admission", formData.admission || "");
+      formDATA.append("aadhar", formData.aadhar || "");
+      formDATA.append("name", formData.name || "");
+      formDATA.append("father", formData.father || "");
+      formDATA.append("mother", formData.mother || "");
+      formDATA.append("category", formData.selectOption || "");
+      formDATA.append("grade", formData.grade || "");
+      formDATA.append("dob", formData.dob || "");
+      formDATA.append("phone", formData.phone || "");
+      formDATA.append("email", formData.email || "");
+      formDATA.append("address", formData.address || "");
+      formDATA.append("account", formData.account || "");
 
-      // Send the form data using your post function
-      await post(props.POST_URL, formDATA, () => {
+      // Only append photo if a new file was actually selected
+      if (photo) {
+        formDATA.append("photo", photo);
+      }
+
+      const postUrl = props.POST_URL || "/api/updateStudent";
+      const res = await axios.post(postUrl, formDATA);
+
+      if (res.status === 200 || res.data?.status === 200) {
         setSuccess(true);
-      });
+      } else {
+        alert("Failed to submit form: " + (res.data?.error || "Unknown error"));
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Failed to submit form");
+      alert(
+        "Failed to submit form: " +
+          (error.response?.data?.error || error.message || "Unknown error")
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -126,48 +186,41 @@ const MyForm = (props) => {
       <div>
         {/* Display selected photo */}
         <label htmlFor="photo" className="cursor-pointer">
-          {formData.photo ? (
-            change ? (
-              <div className="max-w-md mx-auto bg-white shadow-lg overflow-hidden mb-4 mt-10 flex justify-center align-middle rounded-full">
-                <img
-                  className="w-96 h-96"
-                  src={formData.photo}
-                  alt="Selected"
-                />
-              </div>
-            ) : (
-              <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden mb-4 mt-10 flex justify-center align-middle rounded-full">
-                <img
-                  src={`data:image/png;base64,${Uint8Array.from(
-                    formData.photo.data
-                  ).reduce(
-                    (data, byte) => data + String.fromCharCode(byte),
-                    ""
-                  )}`}
-                  alt="Binary Image"
-                  className="w96 h96"
-                />
-              </div>
-            )
+          {change && formData.photo ? (
+            <div className="max-w-md mx-auto bg-white shadow-lg overflow-hidden mb-4 mt-10 flex justify-center align-middle rounded-full">
+              <img
+                className="w-96 h-96 object-cover rounded-full"
+                src={formData.photo}
+                alt="Selected"
+              />
+            </div>
+          ) : formData.photo ? (
+            <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden mb-4 mt-10 flex justify-center align-middle rounded-full">
+              {renderExistingPhoto() || (
+                <div className="w-96 h-96 bg-slate-200 flex items-center justify-center text-slate-500 font-bold rounded-full p-4 text-center">
+                  PHOTO ATTACHED (CLICK TO CHANGE)
+                </div>
+              )}
+            </div>
           ) : (
-            <div className="max-w-md mx-auto bg-slate-400 rounded-lg shadow-lg overflow-hidden mb-4 mt-10 w-full p-10">
-              <span className="text-lg font-bold">SELECT PHOTO</span>
+            <div className="max-w-md mx-auto bg-slate-400 rounded-lg shadow-lg overflow-hidden mb-4 mt-10 w-full p-10 text-center">
+              <span className="text-lg font-bold text-white">SELECT PHOTO</span>
             </div>
           )}
         </label>
 
         {/* Form */}
         <form
-          className="max-w-md mx-auto bg-white p-10 mb-10"
+          className="max-w-md mx-auto bg-white p-10 mb-10 shadow rounded"
           onSubmit={handleSubmit}
         >
           {/* Roll */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="roll">
-              Roll
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="roll">
+              Roll No.
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="roll"
               name="roll"
@@ -176,28 +229,33 @@ const MyForm = (props) => {
             />
           </div>
 
-          {/* Admission */}
+          {/* Admission (Editable & Cascades to Exams) */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="admission">
-              Admission
+            <label className="block mb-1 font-semibold text-blue-700" htmlFor="admission">
+              Admission No.
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border-2 border-blue-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
               type="text"
               id="admission"
               name="admission"
               value={formData.admission}
               onChange={handleChange}
+              placeholder="Enter Admission Number"
+              required
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Note: Updating Admission No. will automatically sync in all exams.
+            </p>
           </div>
 
           {/* Aadhar */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="aadhar">
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="aadhar">
               Aadhar
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="aadhar"
               name="aadhar"
@@ -208,26 +266,27 @@ const MyForm = (props) => {
 
           {/* Name */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="name">
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="name">
               Name
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="name"
               name="name"
               value={formData.name}
               onChange={handleChange}
+              required
             />
           </div>
 
           {/* Father */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="father">
-              Father
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="father">
+              Father's Name
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="father"
               name="father"
@@ -238,11 +297,11 @@ const MyForm = (props) => {
 
           {/* Mother */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="mother">
-              Mother
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="mother">
+              Mother's Name
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="mother"
               name="mother"
@@ -253,11 +312,11 @@ const MyForm = (props) => {
 
           {/* Category */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="selectOption">
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="selectOption">
               Select Category
             </label>
             <select
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               id="selectOption"
               name="selectOption"
               value={formData.selectOption}
@@ -274,11 +333,11 @@ const MyForm = (props) => {
 
           {/* Grade */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="grade">
-              Grade
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="grade">
+              Grade / Class
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="grade"
               name="grade"
@@ -289,11 +348,11 @@ const MyForm = (props) => {
 
           {/* DOB */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="dob">
-              DOB
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="dob">
+              Date of Birth
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="dob"
               name="dob"
@@ -304,11 +363,11 @@ const MyForm = (props) => {
 
           {/* Phone */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="phone">
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="phone">
               Phone
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="phone"
               name="phone"
@@ -319,12 +378,12 @@ const MyForm = (props) => {
 
           {/* Email */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="email">
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="email">
               Email
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
-              type="text"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              type="email"
               id="email"
               name="email"
               value={formData.email}
@@ -334,11 +393,11 @@ const MyForm = (props) => {
 
           {/* Address */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="address">
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="address">
               Address
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="address"
               name="address"
@@ -349,11 +408,11 @@ const MyForm = (props) => {
 
           {/* Account */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="account">
-              Account
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="account">
+              Account No.
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="text"
               id="account"
               name="account"
@@ -364,11 +423,11 @@ const MyForm = (props) => {
 
           {/* Photo */}
           <div className="mb-4">
-            <label className="block mb-1" htmlFor="photo">
+            <label className="block mb-1 font-semibold text-gray-700" htmlFor="photo">
               Photo
             </label>
             <input
-              className="w-full border border-gray-300 rounded px-3 py-2"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               type="file"
               id="photo"
               name="photo"
@@ -378,10 +437,11 @@ const MyForm = (props) => {
           </div>
 
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded cursor-pointer transition duration-200 disabled:opacity-50"
             type="submit"
+            disabled={submitting}
           >
-            Submit
+            {submitting ? "Updating..." : "Submit"}
           </button>
         </form>
       </div>

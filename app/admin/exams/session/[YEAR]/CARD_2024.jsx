@@ -496,7 +496,7 @@ export default function SearchBar(props) {
                     <div className="font-bold uppercase">
                       <span className="opacity-80"> Session: </span>
                       <span className="text-black-700">
-                        NOV-{new Date().getFullYear()}
+                        Oct 2026
                       </span>
                     </div>
                     <div className="font-bold uppercase">
@@ -879,7 +879,7 @@ export default function SearchBar(props) {
                     </span>
                   </div>
                   <div>
-                    RANK:{" "}
+                    POSITION:{" "}
                     <span
                       className={
                         pass && rank == "Nil"

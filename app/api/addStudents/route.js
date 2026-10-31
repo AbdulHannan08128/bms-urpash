@@ -14,7 +14,13 @@ export async function GET(req){
     }
 
   else if(admission) {
-    students = await getStudents({admission:admission});
+    const admStr = String(admission).trim();
+    students = await getStudents({
+      $or: [
+        { admission: admStr },
+        ...(!isNaN(Number(admStr)) ? [{ admission: Number(admStr) }] : [])
+      ]
+    });
   }
   else{
     students = await getStudents({});

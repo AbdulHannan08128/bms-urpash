@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 const TailwindSelect = (props) => {
   const [selectedOption, setSelectedOption] = useState('');
 
+  const currentVal = props.value !== undefined ? props.value : selectedOption;
+
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
     props.func(event.target.value)
@@ -14,7 +16,7 @@ const TailwindSelect = (props) => {
   return (
     <div className="relative">
       <select
-        value={selectedOption}
+        value={currentVal}
         onChange={handleChange}
         className="block appearance-none w-48 bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500 cursor-pointer"
       >

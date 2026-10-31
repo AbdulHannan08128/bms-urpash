@@ -29,7 +29,7 @@ export default function AnalysisDashboard({ initialUrl }) {
           // Set default selected year to latest available
           const years = [...new Set(res.data.map((e) => e.year).filter(Boolean))].sort().reverse();
           if (years.length > 0) {
-            setSelectedYear(years[0]);
+            setSelectedYear(years.includes("2026") ? "2026" : years[0]);
           }
         }
       } catch (err) {
@@ -420,7 +420,7 @@ export default function AnalysisDashboard({ initialUrl }) {
       "Name",
       "Father's Name",
       "Class",
-      "Class Rank",
+      "Class Position",
       "Total Marks",
       "Max Marks",
       "Percentage",
@@ -853,10 +853,10 @@ export default function AnalysisDashboard({ initialUrl }) {
         <div className="analysis-panel">
           <div className="panel-header">
             <div>
-              <h3 className="panel-title">Academic Merit & Top Rankers</h3>
+              <h3 className="panel-title">Academic Merit & Top Positions</h3>
               <p className="panel-subtitle">
                 {selectedClass === "ALL"
-                  ? `Rankings based on overall percentage across all classes for session ${selectedYear}`
+                  ? `Position rankings based on overall percentage across all classes for session ${selectedYear}`
                   : `Leading students in Class ${selectedClass} for session ${selectedYear}`}
               </p>
             </div>
@@ -887,7 +887,7 @@ export default function AnalysisDashboard({ initialUrl }) {
                   <div className="min-w-0">
                     <h4 className="font-bold text-slate-900 text-sm sm:text-base truncate">{st.name}</h4>
                     <p className="text-xs text-slate-500 truncate">
-                      Class {st.class} &bull; Class Rank: {st.rankWithSuffix} &bull; {st.admission !== "N/A" ? `Roll #${st.admission}` : `S/O ${st.father}`}
+                      Class {st.class} &bull; Class Position: {st.rankWithSuffix} &bull; {st.admission !== "N/A" ? `Roll #${st.admission}` : `S/O ${st.father}`}
                     </p>
                   </div>
                 </div>
@@ -1080,7 +1080,7 @@ export default function AnalysisDashboard({ initialUrl }) {
 
                 <div className="student-card-body">
                   <div>
-                    <span className="text-xs text-slate-400 block">Class Rank</span>
+                    <span className="text-xs text-slate-400 block">Class Position</span>
                     <span className="font-bold text-slate-800">{st.rankWithSuffix}</span>
                   </div>
                   <div>
@@ -1120,7 +1120,7 @@ export default function AnalysisDashboard({ initialUrl }) {
               <thead>
                 <tr>
                   <th onClick={() => handleSort("classRank")} className="cursor-pointer">
-                    Class Rank {sortField === "classRank" && (sortOrder === "asc" ? "▲" : "▼")}
+                    Class Position {sortField === "classRank" && (sortOrder === "asc" ? "▲" : "▼")}
                   </th>
                   <th onClick={() => handleSort("admission")} className="cursor-pointer">
                     Admission {sortField === "admission" && (sortOrder === "asc" ? "▲" : "▼")}

@@ -170,7 +170,7 @@ export default function Checklist(props) {
                       <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
                         <div className="relative h-10 w-10">
                           {/* Render the image here */}
-                          {item.photo ? (
+                          {item.photo && item.photo.data && Array.isArray(item.photo.data) ? (
                             <img
                               src={`data:image/png;base64,${Uint8Array.from(
                                 item.photo.data
@@ -180,6 +180,14 @@ export default function Checklist(props) {
                                 ""
                               )}`}
                               alt="Binary Image"
+                              width={50}
+                              height={50}
+                              className={styles.img}
+                            />
+                          ) : item.photo && typeof item.photo === 'string' ? (
+                            <img
+                              src={item.photo.startsWith('data:') ? item.photo : `data:image/png;base64,${item.photo}`}
+                              alt="Image"
                               width={50}
                               height={50}
                               className={styles.img}
